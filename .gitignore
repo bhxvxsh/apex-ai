@@ -1,0 +1,28 @@
+# APEX AI - .gitignore
+# Data directories - keep them out of git (large, reproducible from source)
+01_Data_Raw/
+02_Data_Processed/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.py[cod]
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# SQLite database
+*.db
+*.sqlite
+*.sqlite3
+*.f1.db
