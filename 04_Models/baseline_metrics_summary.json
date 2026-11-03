@@ -1,0 +1,160 @@
+{
+  "phase": "Phase 4 - Advanced ML Pipeline",
+  "train_seasons": [
+    2023,
+    2024
+  ],
+  "test_season": 2025,
+  "race_finishing_prediction_metrics": [
+    {
+      "model": "Status-Quo Grid Baseline",
+      "mae": 2.717,
+      "rmse": 3.911,
+      "r2": 0.429,
+      "acc_within_1_pos": 42.7,
+      "acc_within_2_pos": 58.7,
+      "acc_within_3_pos": 71.5,
+      "top3_accuracy": 92.4,
+      "top10_accuracy": 82.1
+    },
+    {
+      "model": "Ridge Regression",
+      "mae": 2.358,
+      "rmse": 3.08,
+      "r2": 0.646,
+      "acc_within_1_pos": 28.5,
+      "acc_within_2_pos": 53.5,
+      "acc_within_3_pos": 69.3,
+      "top3_accuracy": 90.8,
+      "top10_accuracy": 81.5
+    },
+    {
+      "model": "Random Forest",
+      "mae": 2.36,
+      "rmse": 3.132,
+      "r2": 0.634,
+      "acc_within_1_pos": 31.0,
+      "acc_within_2_pos": 55.2,
+      "acc_within_3_pos": 69.0,
+      "top3_accuracy": 90.8,
+      "top10_accuracy": 78.5
+    },
+    {
+      "model": "Gradient Boosting",
+      "mae": 2.404,
+      "rmse": 3.169,
+      "r2": 0.625,
+      "acc_within_1_pos": 31.2,
+      "acc_within_2_pos": 53.0,
+      "acc_within_3_pos": 68.8,
+      "top3_accuracy": 89.4,
+      "top10_accuracy": 78.0
+    },
+    {
+      "model": "LightGBM Regressor",
+      "mae": 2.447,
+      "rmse": 3.207,
+      "r2": 0.616,
+      "acc_within_1_pos": 30.4,
+      "acc_within_2_pos": 51.9,
+      "acc_within_3_pos": 70.4,
+      "top3_accuracy": 89.7,
+      "top10_accuracy": 78.8
+    },
+    {
+      "model": "XGBoost Regressor",
+      "mae": 2.401,
+      "rmse": 3.175,
+      "r2": 0.624,
+      "acc_within_1_pos": 31.0,
+      "acc_within_2_pos": 54.6,
+      "acc_within_3_pos": 69.0,
+      "top3_accuracy": 90.2,
+      "top10_accuracy": 78.5
+    },
+    {
+      "model": "XGBoost + Intra-Race Ranking",
+      "mae": 2.375,
+      "rmse": 3.337,
+      "r2": 0.584,
+      "acc_within_1_pos": 46.5,
+      "acc_within_2_pos": 63.6,
+      "acc_within_3_pos": 76.6,
+      "top3_accuracy": 91.3,
+      "top10_accuracy": 78.8
+    }
+  ],
+  "classification_metrics": [
+    {
+      "task": "Podium Finish (Top-3)",
+      "accuracy": 91.52,
+      "roc_auc": 93.98,
+      "precision": 70.0,
+      "recall": 66.67
+    },
+    {
+      "task": "Points Finish (Top-10)",
+      "accuracy": 73.48,
+      "roc_auc": 80.6,
+      "precision": 70.95,
+      "recall": 70.95
+    }
+  ],
+  "qualifying_prediction_metrics": [
+    {
+      "model": "Naive Rolling Mean Baseline",
+      "mae": 3.31,
+      "rmse": 4.273,
+      "r2": 0.447,
+      "acc_within_1_pos": 26.7,
+      "acc_within_2_pos": 41.2,
+      "acc_within_3_pos": 56.3,
+      "top3_accuracy": 88.2,
+      "top10_accuracy": 73.3
+    },
+    {
+      "model": "Ridge Regression",
+      "mae": 3.293,
+      "rmse": 4.029,
+      "r2": 0.509,
+      "acc_within_1_pos": 16.4,
+      "acc_within_2_pos": 33.5,
+      "acc_within_3_pos": 50.3,
+      "top3_accuracy": 85.2,
+      "top10_accuracy": 75.6
+    },
+    {
+      "model": "Random Forest",
+      "mae": 3.451,
+      "rmse": 4.204,
+      "r2": 0.465,
+      "acc_within_1_pos": 15.5,
+      "acc_within_2_pos": 32.8,
+      "acc_within_3_pos": 49.0,
+      "top3_accuracy": 85.0,
+      "top10_accuracy": 74.9
+    },
+    {
+      "model": "XGBoost Regressor",
+      "mae": 3.489,
+      "rmse": 4.267,
+      "r2": 0.449,
+      "acc_within_1_pos": 16.6,
+      "acc_within_2_pos": 33.0,
+      "acc_within_3_pos": 49.2,
+      "top3_accuracy": 84.5,
+      "top10_accuracy": 74.5
+    },
+    {
+      "model": "XGBoost + Intra-Session Ranking",
+      "mae": 3.692,
+      "rmse": 4.775,
+      "r2": 0.309,
+      "acc_within_1_pos": 26.2,
+      "acc_within_2_pos": 44.0,
+      "acc_within_3_pos": 57.4,
+      "top3_accuracy": 85.9,
+      "top10_accuracy": 73.1
+    }
+  ]
+}
