@@ -49,12 +49,38 @@ COMMANDS = [
     "/career",
     "/deltas",
     "/exec",
+    "/connect",
+    "/disconnect",
     "/models",
     "/help",
     "/clear",
     "/exit",
     "/quit",
 ]
+
+# Remote Colab Endpoint configuration
+COLAB_ENDPOINT = None
+CONFIG_FILE = os.path.join(CURRENT_DIR, ".apex_config.json")
+
+def load_colab_config():
+    global COLAB_ENDPOINT
+    if os.path.exists(CONFIG_FILE):
+        try:
+            import json
+            with open(CONFIG_FILE, "r") as f:
+                cfg = json.load(f)
+                COLAB_ENDPOINT = cfg.get("colab_endpoint", None)
+        except Exception:
+            COLAB_ENDPOINT = None
+
+def save_colab_config(endpoint: str):
+    global COLAB_ENDPOINT
+    COLAB_ENDPOINT = endpoint.strip().rstrip("/")
+    import json
+    with open(CONFIG_FILE, "w") as f:
+        json.dump({"colab_endpoint": COLAB_ENDPOINT}, f, indent=2)
+
+load_colab_config()
 
 
 def display_banner():
@@ -83,6 +109,8 @@ def display_help():
     table.add_row("/career", "<DRIVER>", "Multi-season win, podium, and points breakdown (e.g. /career HAM)")
     table.add_row("/deltas", "<DRIVER> [YEAR]", "Saturday qualifying to Sunday race net position changes (e.g. /deltas NOR 2024)")
     table.add_row("/exec", "<PYTHON CODE>", "Run arbitrary custom code dynamically in sandboxed runtime with live f1.db")
+    table.add_row("/connect", "<URL>", "Link APEX CLI to your fine-tuned model running on Google Colab (e.g. /connect https://xyz.ngrok-free.app)")
+    table.add_row("/disconnect", "", "Disconnect from Colab and revert to local hybrid engine")
     table.add_row("/models", "", "Show performance metrics and status of trained Phase 4 ML models")
     table.add_row("/clear", "", "Clear terminal screen")
     table.add_row("/help", "", "Show this commands reference")
@@ -310,13 +338,68 @@ def handle_exec(code: str):
         console.print(Panel(res["error"], title="Execution Failed", border_style="red"))
 
 
+def handle_connect(args: str):
+    url = args.strip()
+    if not url:
+        if COLAB_ENDPOINT:
+            console.print(f"[bold green]Currently connected to Colab LLM:[/bold green] [cyan]{COLAB_ENDPOINT}[/cyan]")
+        else:
+            console.print("[bold red]Usage:[/bold red] /connect <COLAB_NGROK_URL> (e.g., [cyan]/connect https://xxxx.ngrok-free.app[/cyan])")
+        return
+
+    with console.status(f"[bold cyan]Pinging Colab endpoint {url}...", spinner="dots"):
+        import requests
+        try:
+            r = requests.get(f"{url.rstrip('/')}/health", timeout=5)
+            if r.status_code == 200:
+                save_colab_config(url)
+                console.print(f"[bold green]✓ Successfully connected to fine-tuned Colab LLM![/bold green] Endpoint saved: [cyan]{COLAB_ENDPOINT}[/cyan]")
+                return
+        except Exception as e:
+            # Fallback: still save if health check times out but URL format is valid
+            save_colab_config(url)
+            console.print(f"[yellow]Endpoint saved as [cyan]{COLAB_ENDPOINT}[/cyan] (Health check note: {str(e)}). Queries will now be forwarded to Colab.[/yellow]")
+
+
+def handle_disconnect():
+    global COLAB_ENDPOINT
+    COLAB_ENDPOINT = None
+    if os.path.exists(CONFIG_FILE):
+        try:
+            os.remove(CONFIG_FILE)
+        except Exception:
+            pass
+    console.print("[bold cyan]Disconnected from Colab. APEX CLI is now running in local hybrid engine mode.[/bold cyan]")
+
+
 def handle_natural_query(user_query: str):
-    """Fallback natural-language router."""
+    """Query router: forward to remote fine-tuned Colab LLM if connected, else use local engine."""
+    global COLAB_ENDPOINT
+    if COLAB_ENDPOINT:
+        with console.status("[bold green]Streaming from Fine-Tuned Llama-3 (Google Colab T4 GPU)...", spinner="aesthetic"):
+            import requests
+            try:
+                res = requests.post(
+                    f"{COLAB_ENDPOINT}/ask",
+                    json={"query": user_query},
+                    timeout=30
+                )
+                if res.status_code == 200:
+                    ans = res.json().get("response", "")
+                    console.print(Panel(Markdown(ans), title="APEX AI — Fine-Tuned Llama-3 (Colab)", border_style="green"))
+                    return
+                else:
+                    console.print(f"[bold red]Colab server returned error {res.status_code}: {res.text}[/bold red]")
+                    console.print("[dim]Falling back to local analytical engine...[/dim]")
+            except Exception as e:
+                console.print(f"[yellow]Failed to reach Colab ({str(e)}). Falling back to local engine...[/yellow]")
+
+    # Local Engine Fallback
     from ask_apex_cli import ask_apex
-    with console.status("[bold cyan]Analyzing query & routing to APEX AI Engine...", spinner="dots"):
+    with console.status("[bold cyan]Analyzing query & routing to local APEX AI Engine...", spinner="dots"):
         time.sleep(0.3)
         response = ask_apex(user_query)
-    console.print(Panel(response, title="APEX AI Response", border_style="cyan"))
+    console.print(Panel(response, title="APEX AI Response (Local Hybrid Engine)", border_style="cyan"))
 
 
 def main():
@@ -362,6 +445,10 @@ def main():
                 handle_deltas(user_input[len("/deltas"):])
             elif user_input.startswith("/models"):
                 handle_models()
+            elif user_input.startswith("/connect"):
+                handle_connect(user_input[len("/connect"):])
+            elif user_input.startswith("/disconnect"):
+                handle_disconnect()
             elif user_input.startswith("/exec"):
                 handle_exec(user_input[len("/exec"):])
             else:
@@ -376,3 +463,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
