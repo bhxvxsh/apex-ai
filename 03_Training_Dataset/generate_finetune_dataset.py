@@ -118,3 +118,4 @@ if __name__ == "__main__":
     CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
     BASE_DIR = os.path.dirname(CURRENT_DIR)
     save_fine_tuning_dataset(os.path.join(BASE_DIR, "03_Training_Dataset", "f1_technical_alpaca.json"))
+
