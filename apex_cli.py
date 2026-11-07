@@ -43,7 +43,7 @@ console = Console()
 sandbox = DynamicF1AnalystSandbox()
 
 def clean_terminal_text(text: str) -> str:
-    """
+    r"""
     Sanitize and render raw LaTeX, math symbols, and escaped characters
     into clean, readable Unicode terminal characters for Windows console.
     Converts: ($\mu_{\text{peak}}$) -> (μ_peak), $\Delta t \le +0.250\text{s}$ -> Δt ≤ +0.250s, etc.
@@ -95,6 +95,7 @@ def clean_terminal_text(text: str) -> str:
 
 COMMANDS = [
     "/predict",
+    "/circuit",
     "/standings",
     "/consistent",
     "/career",
@@ -103,10 +104,9 @@ COMMANDS = [
     "/connect",
     "/disconnect",
     "/models",
-    "/help",
     "/clear",
+    "/help",
     "/exit",
-    "/quit",
 ]
 
 # Remote Colab Endpoint configuration
@@ -154,7 +154,8 @@ def display_help():
     table.add_column("Arguments", style="yellow", width=22)
     table.add_column("Description", style="white")
 
-    table.add_row("/predict", "<DRIVER> <GRID>", "Predict finish, podium probability & points odds using XGBoost (e.g. /predict VER 3)")
+    table.add_row("/predict", "<DRIVER> <GRID> [EVENT]", "Predict finish, podium probability & points odds using ML + Circuit clusters (e.g. /predict VER 3 Monza)")
+    table.add_row("/circuit", "<CIRCUIT>", "Physical downforce taxonomy, tire stress, and micro-sector apex speed (e.g. /circuit Monaco)")
     table.add_row("/standings", "[YEAR]", "Display championship table for 2023, 2024, or 2025 (e.g. /standings 2023)")
     table.add_row("/consistent", "[TOP_N]", "Rank drivers by position variance / consistency stddev across 2023-2025")
     table.add_row("/career", "<DRIVER>", "Multi-season win, podium, and points breakdown (e.g. /career HAM)")
@@ -168,13 +169,13 @@ def display_help():
     table.add_row("/exit", "", "Quit APEX CLI")
 
     console.print(table)
-    console.print("\n[dim]You can also type natural queries directly: e.g. [italic]\"Predict race for Norris starting P2\"[/italic] or [italic]\"Who won in 2024?\"[/italic][/dim]\n")
+    console.print("\n[dim]You can also type natural queries directly: e.g. [italic]\"Predict race for Norris starting P2 at Silverstone\"[/italic] or [italic]\"Who won in 2024?\"[/italic][/dim]\n")
 
 
 def handle_predict(args: str):
     parts = args.strip().split()
     if len(parts) < 2:
-        console.print("[bold red]Usage:[/bold red] /predict <DRIVER_CODE> <GRID_POS> (e.g., [cyan]/predict VER 2[/cyan])")
+        console.print("[bold red]Usage:[/bold red] /predict <DRIVER_CODE> <GRID_POS> [CIRCUIT] (e.g., [cyan]/predict VER 2[/cyan] or [cyan]/predict NOR 1 Monaco[/cyan])")
         return
     driver = parts[0].upper()
     try:
@@ -183,21 +184,54 @@ def handle_predict(args: str):
         console.print("[bold red]Error:[/bold red] Grid position must be an integer (1 to 20).")
         return
 
-    with console.status(f"[bold green]Running XGBoost Inference for {driver} starting P{grid}...", spinner="dots"):
+    event_name = " ".join(parts[2:]) if len(parts) > 2 else "Bahrain Grand Prix"
+
+    with console.status(f"[bold green]Running XGBoost Inference for {driver} starting P{grid} ({event_name})...", spinner="dots"):
         time.sleep(0.3)
-        res_raw = execute_tool("predict_race", {"driver_id": driver, "grid_position": grid})
+        res_raw = execute_tool("predict_race", {"driver_id": driver, "grid_position": grid, "event_name": event_name})
         import json
         data = json.loads(res_raw)
 
-    table = Table(title=f"Race Prediction: {driver} (Grid: P{grid})", border_style="green", header_style="bold green")
+    table = Table(title=f"Race Prediction: {driver} (Grid: P{grid} | {data.get('event_name', event_name)})", border_style="green", header_style="bold green")
     table.add_column("Metric", style="bold cyan")
     table.add_column("Prediction", style="bold white")
-    table.add_column("Statistical Confidence", style="dim")
+    table.add_column("Statistical / Physics Regime", style="dim")
 
     table.add_row("Expected Finish", str(data.get("predicted_finish_position")), "MAE: 2.3 positions")
-    table.add_row("Podium Probability (Top 3)", str(data.get("podium_probability")), "ROC-AUC: 94.0% | Acc: 91.5%")
-    table.add_row("Points Probability (Top 10)", str(data.get("points_probability")), "ROC-AUC: 80.6%")
-    table.add_row("Starting Slot", f"P{grid}", "Normalized pole delta applied")
+    table.add_row("Podium Probability (Top 3)", str(data.get("podium_probability")), "ROC-AUC: 94.4% | Acc: 90.4%")
+    table.add_row("Points Probability (Top 10)", str(data.get("points_probability")), "ROC-AUC: 81.8% | Acc: 75.2%")
+    table.add_row("Circuit Cluster", str(data.get("circuit_cluster", "N/A")), f"Aero Regime: {data.get('downforce_regime', 'Medium')}")
+    table.add_row("Tire Stress Index", f"{data.get('tire_stress_index', 'N/A')} / 5.0", "Surface abrasiveness & thermal degradation")
+    table.add_row("Starting Slot", f"P{grid}", "Normalized micro-sector delta applied")
+
+    console.print(table)
+
+
+def handle_circuit(args: str):
+    query = args.strip()
+    if not query:
+        console.print("[bold red]Usage:[/bold red] /circuit <CIRCUIT_OR_EVENT> (e.g. [cyan]/circuit Monaco[/cyan] or [cyan]/circuit Monza[/cyan])")
+        return
+
+    with console.status(f"[bold cyan]Querying aerodynamic profile & micro-sectors for '{query}'...", spinner="dots"):
+        time.sleep(0.2)
+        import json
+        res = json.loads(execute_tool("circuit_profile", {"circuit_or_event": query}))
+
+    table = Table(title=f"Circuit Engineering Profile — {res.get('event_query')}", border_style="cyan", header_style="bold magenta")
+    table.add_column("Engineering Parameter", style="bold cyan", width=25)
+    table.add_column("Benchmark Value", style="bold white", width=30)
+    table.add_column("Aero / Dynamics Impact", style="dim")
+
+    table.add_row("Cluster Taxonomy", f"Cluster {res.get('cluster_id')}: {res.get('cluster_name')}", "Downforce & speed distribution")
+    table.add_row("Downforce Level", str(res.get("downforce_regime")), "Wing angle & floor aerodynamic trim")
+    table.add_row("Tire Stress Index", f"{res.get('tire_stress_index')} / 5.0", "Surface abrasiveness & degradation risk")
+    table.add_row("Full Throttle Duty", str(res.get("full_throttle_pct")), "Engine thermal load & drag penalty")
+    table.add_row("Micro-Sector Apex V_min", str(res.get("apex_speed_v_min")), "Critical minimum cornering velocity")
+    table.add_row("Overtaking Difficulty", str(res.get("overtaking_difficulty")), "Track width & delta-to-overtake threshold")
+    table.add_row("Brake Energy Demand", str(res.get("brake_energy_level")), "Brake cooling & thermal rotor duty")
+
+    console.print(table)
 
     console.print(table)
 
@@ -488,6 +522,8 @@ def main():
                 display_help()
             elif user_input.startswith("/predict"):
                 handle_predict(user_input[len("/predict"):])
+            elif user_input.startswith("/circuit"):
+                handle_circuit(user_input[len("/circuit"):])
             elif user_input.startswith("/standings"):
                 handle_standings(user_input[len("/standings"):])
             elif user_input.startswith("/consistent"):

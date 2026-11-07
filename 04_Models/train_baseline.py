@@ -1,5 +1,5 @@
 """
-APEX AI - High-Accuracy Machine Learning Pipeline
+APEX AI - High-Accuracy Machine Learning Pipeline (Betterments 1 & 2 Enriched)
 
 Trains, benchmarks, and serializes state-of-the-art F1 prediction models:
 1. Race Finishing Position Prediction (Continuous & Intra-Race Ranked)
@@ -7,14 +7,9 @@ Trains, benchmarks, and serializes state-of-the-art F1 prediction models:
 3. Points Finish Classification (Top-10 Finish)
 4. Qualifying Position Prediction (Continuous & Ranked)
 
-Models evaluated:
-- Status-Quo Grid Baseline
-- Ridge Regularized Regression
-- Random Forest Regressor
-- Gradient Boosting Regressor
-- LightGBM Regressor
-- XGBoost Regressor (with Intra-Race Ranking)
-- XGBoost Podium & Points Classifiers
+Enriched with:
+- Betterment 1: Micro-Sector Telemetry, Pace Efficiency, Intra-Session Lap Progression
+- Betterment 2: Circuit Aerodynamic Taxonomy (4 Clusters), Tire Stress Index, Overtaking Sensitivity
 """
 
 import os
@@ -38,6 +33,69 @@ from sklearn.metrics import (
     recall_score,
     roc_auc_score,
 )
+
+# Feature sets with Betterments 1 & 2
+RACE_FEATURES = [
+    'GridPosition',
+    'pole_delta_s',
+    'teammate_delta_s',
+    'q_pace_efficiency',
+    'q_session_progression',
+    'q3_executed',
+    'apex_speed_eff',
+    'circuit_cluster_id',
+    'tire_stress_index',
+    'full_throttle_pct',
+    'v_min_benchmark_kmh',
+    'overtaking_difficulty_idx',
+    'overtaking_sensitivity',
+    'tire_deg_stress_impact',
+    'driver_race_mean_all',
+    'driver_race_mean_last3',
+    'driver_momentum',
+    'driver_avg_gain',
+    'driver_finish_rate',
+    'driver_podium_rate',
+    'driver_top10_rate',
+    'team_race_mean',
+    'team_points_ytd',
+]
+
+CLASSIFICATION_FEATURES = [
+    'GridPosition',
+    'pole_delta_s',
+    'teammate_delta_s',
+    'q_pace_efficiency',
+    'q_session_progression',
+    'q3_executed',
+    'apex_speed_eff',
+    'circuit_cluster_id',
+    'tire_stress_index',
+    'full_throttle_pct',
+    'overtaking_sensitivity',
+    'tire_deg_stress_impact',
+    'driver_race_mean_all',
+    'driver_race_mean_last3',
+    'driver_momentum',
+    'driver_podium_rate',
+    'driver_top10_rate',
+    'team_race_mean',
+    'team_points_ytd',
+]
+
+QUALIFYING_FEATURES = [
+    'circuit_cluster_id',
+    'tire_stress_index',
+    'full_throttle_pct',
+    'v_min_benchmark_kmh',
+    'overtaking_difficulty_idx',
+    'driver_qual_mean_all',
+    'driver_qual_mean_last3',
+    'driver_qual_best',
+    'team_qual_mean',
+    'team_qual_mean_last3',
+    'team_points_ytd',
+]
 
 
 def evaluate_regression(y_true: np.ndarray, y_pred: np.ndarray, model_name: str) -> dict:
@@ -72,21 +130,7 @@ def train_race_models(train_df: pd.DataFrame, test_df: pd.DataFrame, out_dir: st
     print(" TASK 1: RACE FINISHING POSITION PREDICTION (2025 HELD-OUT TEST EVALUATION)")
     print("=" * 80)
 
-    features = [
-        'GridPosition',
-        'pole_delta_s',
-        'teammate_delta_s',
-        'driver_race_mean_all',
-        'driver_race_mean_last3',
-        'driver_momentum',
-        'driver_avg_gain',
-        'driver_finish_rate',
-        'driver_podium_rate',
-        'driver_top10_rate',
-        'team_race_mean',
-        'team_points_ytd',
-    ]
-
+    features = RACE_FEATURES
     target = 'RacePosition'
 
     tr = train_df[train_df['finished'] == 1].dropna(subset=[target] + features).copy()
@@ -132,9 +176,9 @@ def train_race_models(train_df: pd.DataFrame, test_df: pd.DataFrame, out_dir: st
 
     # Feature Importance for XGBoost
     importances = pd.Series(xgb_model.feature_importances_, index=features).sort_values(ascending=False)
-    fig, ax = plt.subplots(figsize=(9, 5))
+    fig, ax = plt.subplots(figsize=(10, 6))
     sns.barplot(x=importances.values, y=importances.index, ax=ax, palette='mako')
-    ax.set_title("Race Finish Prediction: Feature Importances (XGBoost)")
+    ax.set_title("Race Finish Prediction: Feature Importances with Betterments 1 & 2")
     ax.set_xlabel("Feature Importance Score")
     fig.tight_layout()
     fig.savefig(os.path.join(out_dir, "figures", "feature_importance_race.png"), dpi=150)
@@ -171,18 +215,7 @@ def train_classification_models(train_df: pd.DataFrame, test_df: pd.DataFrame, o
     print(" TASK 2: HIGH-STAKES CLASSIFICATION (PODIUM & POINTS FINISHES)")
     print("=" * 80)
 
-    features = [
-        'GridPosition',
-        'pole_delta_s',
-        'teammate_delta_s',
-        'driver_race_mean_all',
-        'driver_race_mean_last3',
-        'driver_momentum',
-        'driver_podium_rate',
-        'driver_top10_rate',
-        'team_race_mean',
-        'team_points_ytd',
-    ]
+    features = CLASSIFICATION_FEATURES
 
     tr = train_df.dropna(subset=['is_podium', 'is_top10'] + features).copy()
     te = test_df.dropna(subset=['is_podium', 'is_top10'] + features).copy()
@@ -233,15 +266,7 @@ def train_qualifying_models(train_df: pd.DataFrame, test_df: pd.DataFrame, out_d
     print(" TASK 3: QUALIFYING POSITION PREDICTION")
     print("=" * 80)
 
-    features = [
-        'driver_qual_mean_all',
-        'driver_qual_mean_last3',
-        'driver_qual_best',
-        'team_qual_mean',
-        'team_qual_mean_last3',
-        'team_points_ytd',
-    ]
-
+    features = QUALIFYING_FEATURES
     target = 'QualPosition'
 
     tr = train_df.dropna(subset=[target] + features).copy()
@@ -311,7 +336,16 @@ def run_pipeline():
     qual_results = train_qualifying_models(train_df, test_df, out_dir)
 
     summary = {
-        'phase': 'Phase 4 - Advanced ML Pipeline',
+        'phase': 'Phase 4 - Advanced ML Pipeline with Betterments 1 & 2',
+        'betterments': [
+            'Betterment 1: Corner-Level Micro-Sector Telemetry & Qualifying Dynamics',
+            'Betterment 2: Circuit Taxonomy & Downforce Regime Clustering (4 Clusters)'
+        ],
+        'features_used': {
+            'race_features': RACE_FEATURES,
+            'classification_features': CLASSIFICATION_FEATURES,
+            'qualifying_features': QUALIFYING_FEATURES,
+        },
         'train_seasons': [2023, 2024],
         'test_season': 2025,
         'race_finishing_prediction_metrics': race_results,
@@ -322,6 +356,15 @@ def run_pipeline():
     summary_file = os.path.join(out_dir, "baseline_metrics_summary.json")
     with open(summary_file, 'w') as f:
         json.dump(summary, f, indent=2)
+
+    # Also save schema for inference
+    schema_file = os.path.join(out_dir, "saved_models", "feature_schema.json")
+    with open(schema_file, 'w') as f:
+        json.dump({
+            'race_features': RACE_FEATURES,
+            'classification_features': CLASSIFICATION_FEATURES,
+            'qualifying_features': QUALIFYING_FEATURES,
+        }, f, indent=2)
 
     print(f"\n[OK] Advanced ML pipeline complete! Summary written to: {summary_file}")
 

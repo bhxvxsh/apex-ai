@@ -1,5 +1,70 @@
 {
-  "phase": "Phase 4 - Advanced ML Pipeline",
+  "phase": "Phase 4 - Advanced ML Pipeline with Betterments 1 & 2",
+  "betterments": [
+    "Betterment 1: Corner-Level Micro-Sector Telemetry & Qualifying Dynamics",
+    "Betterment 2: Circuit Taxonomy & Downforce Regime Clustering (4 Clusters)"
+  ],
+  "features_used": {
+    "race_features": [
+      "GridPosition",
+      "pole_delta_s",
+      "teammate_delta_s",
+      "q_pace_efficiency",
+      "q_session_progression",
+      "q3_executed",
+      "apex_speed_eff",
+      "circuit_cluster_id",
+      "tire_stress_index",
+      "full_throttle_pct",
+      "v_min_benchmark_kmh",
+      "overtaking_difficulty_idx",
+      "overtaking_sensitivity",
+      "tire_deg_stress_impact",
+      "driver_race_mean_all",
+      "driver_race_mean_last3",
+      "driver_momentum",
+      "driver_avg_gain",
+      "driver_finish_rate",
+      "driver_podium_rate",
+      "driver_top10_rate",
+      "team_race_mean",
+      "team_points_ytd"
+    ],
+    "classification_features": [
+      "GridPosition",
+      "pole_delta_s",
+      "teammate_delta_s",
+      "q_pace_efficiency",
+      "q_session_progression",
+      "q3_executed",
+      "apex_speed_eff",
+      "circuit_cluster_id",
+      "tire_stress_index",
+      "full_throttle_pct",
+      "overtaking_sensitivity",
+      "tire_deg_stress_impact",
+      "driver_race_mean_all",
+      "driver_race_mean_last3",
+      "driver_momentum",
+      "driver_podium_rate",
+      "driver_top10_rate",
+      "team_race_mean",
+      "team_points_ytd"
+    ],
+    "qualifying_features": [
+      "circuit_cluster_id",
+      "tire_stress_index",
+      "full_throttle_pct",
+      "v_min_benchmark_kmh",
+      "overtaking_difficulty_idx",
+      "driver_qual_mean_all",
+      "driver_qual_mean_last3",
+      "driver_qual_best",
+      "team_qual_mean",
+      "team_qual_mean_last3",
+      "team_points_ytd"
+    ]
+  },
   "train_seasons": [
     2023,
     2024
@@ -19,85 +84,85 @@
     },
     {
       "model": "Ridge Regression",
-      "mae": 2.358,
-      "rmse": 3.08,
-      "r2": 0.646,
-      "acc_within_1_pos": 28.5,
-      "acc_within_2_pos": 53.5,
-      "acc_within_3_pos": 69.3,
-      "top3_accuracy": 90.8,
-      "top10_accuracy": 81.5
+      "mae": 2.403,
+      "rmse": 3.162,
+      "r2": 0.627,
+      "acc_within_1_pos": 26.9,
+      "acc_within_2_pos": 55.7,
+      "acc_within_3_pos": 69.8,
+      "top3_accuracy": 89.7,
+      "top10_accuracy": 80.7
     },
     {
       "model": "Random Forest",
-      "mae": 2.36,
-      "rmse": 3.132,
-      "r2": 0.634,
-      "acc_within_1_pos": 31.0,
-      "acc_within_2_pos": 55.2,
-      "acc_within_3_pos": 69.0,
-      "top3_accuracy": 90.8,
-      "top10_accuracy": 78.5
+      "mae": 2.372,
+      "rmse": 3.114,
+      "r2": 0.638,
+      "acc_within_1_pos": 29.9,
+      "acc_within_2_pos": 55.7,
+      "acc_within_3_pos": 70.7,
+      "top3_accuracy": 89.9,
+      "top10_accuracy": 79.9
     },
     {
       "model": "Gradient Boosting",
-      "mae": 2.404,
-      "rmse": 3.169,
-      "r2": 0.625,
-      "acc_within_1_pos": 31.2,
-      "acc_within_2_pos": 53.0,
+      "mae": 2.46,
+      "rmse": 3.251,
+      "r2": 0.606,
+      "acc_within_1_pos": 30.2,
+      "acc_within_2_pos": 56.0,
       "acc_within_3_pos": 68.8,
-      "top3_accuracy": 89.4,
-      "top10_accuracy": 78.0
+      "top3_accuracy": 87.8,
+      "top10_accuracy": 78.3
     },
     {
       "model": "LightGBM Regressor",
-      "mae": 2.447,
-      "rmse": 3.207,
-      "r2": 0.616,
+      "mae": 2.377,
+      "rmse": 3.156,
+      "r2": 0.628,
       "acc_within_1_pos": 30.4,
-      "acc_within_2_pos": 51.9,
-      "acc_within_3_pos": 70.4,
-      "top3_accuracy": 89.7,
-      "top10_accuracy": 78.8
-    },
-    {
-      "model": "XGBoost Regressor",
-      "mae": 2.401,
-      "rmse": 3.175,
-      "r2": 0.624,
-      "acc_within_1_pos": 31.0,
       "acc_within_2_pos": 54.6,
       "acc_within_3_pos": 69.0,
       "top3_accuracy": 90.2,
-      "top10_accuracy": 78.5
+      "top10_accuracy": 78.0
+    },
+    {
+      "model": "XGBoost Regressor",
+      "mae": 2.411,
+      "rmse": 3.196,
+      "r2": 0.619,
+      "acc_within_1_pos": 29.1,
+      "acc_within_2_pos": 54.1,
+      "acc_within_3_pos": 69.3,
+      "top3_accuracy": 88.3,
+      "top10_accuracy": 78.3
     },
     {
       "model": "XGBoost + Intra-Race Ranking",
-      "mae": 2.375,
-      "rmse": 3.337,
-      "r2": 0.584,
-      "acc_within_1_pos": 46.5,
-      "acc_within_2_pos": 63.6,
-      "acc_within_3_pos": 76.6,
-      "top3_accuracy": 91.3,
-      "top10_accuracy": 78.8
+      "mae": 2.348,
+      "rmse": 3.279,
+      "r2": 0.599,
+      "acc_within_1_pos": 47.0,
+      "acc_within_2_pos": 64.9,
+      "acc_within_3_pos": 75.0,
+      "top3_accuracy": 90.8,
+      "top10_accuracy": 79.3
     }
   ],
   "classification_metrics": [
     {
       "task": "Podium Finish (Top-3)",
-      "accuracy": 91.52,
-      "roc_auc": 93.98,
-      "precision": 70.0,
-      "recall": 66.67
+      "accuracy": 90.43,
+      "roc_auc": 94.43,
+      "precision": 67.27,
+      "recall": 58.73
     },
     {
       "task": "Points Finish (Top-10)",
-      "accuracy": 73.48,
-      "roc_auc": 80.6,
-      "precision": 70.95,
-      "recall": 70.95
+      "accuracy": 75.22,
+      "roc_auc": 81.78,
+      "precision": 73.3,
+      "recall": 71.9
     }
   ],
   "qualifying_prediction_metrics": [
@@ -114,46 +179,46 @@
     },
     {
       "model": "Ridge Regression",
-      "mae": 3.293,
+      "mae": 3.297,
       "rmse": 4.029,
-      "r2": 0.509,
-      "acc_within_1_pos": 16.4,
-      "acc_within_2_pos": 33.5,
-      "acc_within_3_pos": 50.3,
+      "r2": 0.508,
+      "acc_within_1_pos": 15.7,
+      "acc_within_2_pos": 33.0,
+      "acc_within_3_pos": 51.0,
       "top3_accuracy": 85.2,
-      "top10_accuracy": 75.6
+      "top10_accuracy": 75.4
     },
     {
       "model": "Random Forest",
-      "mae": 3.451,
-      "rmse": 4.204,
-      "r2": 0.465,
-      "acc_within_1_pos": 15.5,
-      "acc_within_2_pos": 32.8,
-      "acc_within_3_pos": 49.0,
-      "top3_accuracy": 85.0,
-      "top10_accuracy": 74.9
+      "mae": 3.468,
+      "rmse": 4.247,
+      "r2": 0.454,
+      "acc_within_1_pos": 16.6,
+      "acc_within_2_pos": 32.6,
+      "acc_within_3_pos": 48.3,
+      "top3_accuracy": 85.2,
+      "top10_accuracy": 74.0
     },
     {
       "model": "XGBoost Regressor",
-      "mae": 3.489,
-      "rmse": 4.267,
+      "mae": 3.474,
+      "rmse": 4.264,
       "r2": 0.449,
-      "acc_within_1_pos": 16.6,
-      "acc_within_2_pos": 33.0,
-      "acc_within_3_pos": 49.2,
-      "top3_accuracy": 84.5,
-      "top10_accuracy": 74.5
+      "acc_within_1_pos": 15.5,
+      "acc_within_2_pos": 33.9,
+      "acc_within_3_pos": 49.7,
+      "top3_accuracy": 85.9,
+      "top10_accuracy": 73.8
     },
     {
       "model": "XGBoost + Intra-Session Ranking",
-      "mae": 3.692,
-      "rmse": 4.775,
-      "r2": 0.309,
-      "acc_within_1_pos": 26.2,
-      "acc_within_2_pos": 44.0,
-      "acc_within_3_pos": 57.4,
-      "top3_accuracy": 85.9,
+      "mae": 3.674,
+      "rmse": 4.76,
+      "r2": 0.314,
+      "acc_within_1_pos": 28.5,
+      "acc_within_2_pos": 42.8,
+      "acc_within_3_pos": 57.2,
+      "top3_accuracy": 85.4,
       "top10_accuracy": 73.1
     }
   ]

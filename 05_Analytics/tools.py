@@ -21,6 +21,7 @@ from driver_performance import get_driver_standings, get_driver_season_compariso
 from qualifying_deltas import get_qualifying_race_deltas, get_driver_delta_stats
 from consistency import get_driver_consistency, get_season_consistency_comparison, get_all_drivers_consistency
 from evaluate_models import ApexMLPredictor
+from circuit_clusters import get_circuit_features, CIRCUIT_TAXONOMY
 
 
 # Singleton predictor
@@ -98,10 +99,27 @@ def tool_qualifying_race_delta(driver_id: str, season: Optional[int] = 2023) -> 
     }
 
 
-def tool_predict_race(driver_id: str, grid_position: int, round_num: int = 5) -> Dict[str, Any]:
+def tool_circuit_profile(circuit_or_event: str) -> Dict[str, Any]:
+    """Get the physical engineering profile, downforce cluster, tire stress, and micro-sector apex benchmarks for an F1 circuit."""
+    feat = get_circuit_features(circuit_or_event)
+    return {
+        "event_query": circuit_or_event,
+        "cluster_id": feat["cluster_id"],
+        "cluster_name": feat["cluster_name"],
+        "downforce_regime": feat["downforce_level"],
+        "tire_stress_index": feat["tire_stress_index"],
+        "full_throttle_pct": f"{feat['full_throttle_pct']}%",
+        "overtaking_difficulty": feat["overtaking_difficulty"],
+        "apex_speed_v_min": f"{feat['v_min_benchmark_kmh']} km/h",
+        "brake_energy_level": feat["brake_energy_level"],
+    }
+
+
+def tool_predict_race(driver_id: str, grid_position: int, round_num: int = 5, event_name: str = "Bahrain Grand Prix") -> Dict[str, Any]:
     """
     Predict Sunday race finish using the trained Phase 4 ML models:
-    Returns expected finish position, podium probability (Top 3), and points probability (Top 10).
+    Returns expected finish position, podium probability (Top 3), points probability (Top 10),
+    and circuit downforce cluster impact.
     """
     predictor = _get_predictor()
     # Resolve historical baselines for driver
@@ -110,8 +128,11 @@ def tool_predict_race(driver_id: str, grid_position: int, round_num: int = 5) ->
     finish_rate = cons.get('finish_rate', 85.0) or 85.0
     podium_rate = (cons.get('podium_finishes', 0) / max(cons.get('races_analyzed', 1), 1)) * 100
 
+    c_feat = get_circuit_features(event_name)
+
     features = {
         'DriverId': driver_id,
+        'event_name': event_name,
         'GridPosition': float(grid_position),
         'pole_delta_s': max(0.0, (grid_position - 1) * 0.15),
         'teammate_delta_s': 0.0,
@@ -132,11 +153,15 @@ def tool_predict_race(driver_id: str, grid_position: int, round_num: int = 5) ->
 
     return {
         "driver_id": driver_id.upper(),
+        "event_name": event_name,
+        "circuit_cluster": c_feat["cluster_name"],
+        "downforce_regime": c_feat["downforce_level"],
+        "tire_stress_index": c_feat["tire_stress_index"],
         "starting_grid": grid_position,
         "predicted_finish_position": f"P{exp_finish:.1f}",
         "podium_probability": f"{podium_prob}%",
         "points_probability": f"{points_prob}%",
-        "model_confidence": "Podium ROC-AUC: 94.0%, Race MAE: 2.3 positions"
+        "model_confidence": "Podium ROC-AUC: 94.4%, Race MAE: 2.3 positions"
     }
 
 
@@ -147,6 +172,7 @@ TOOLS = {
     "consistency_ranking": tool_consistency_ranking,
     "qualifying_race_delta": tool_qualifying_race_delta,
     "predict_race": tool_predict_race,
+    "circuit_profile": tool_circuit_profile,
 }
 
 TOOL_SCHEMAS = [
@@ -196,14 +222,26 @@ TOOL_SCHEMAS = [
     },
     {
         "name": "predict_race",
-        "description": "Predict Sunday race finish position, podium probability, and points probability from starting grid position using ML models.",
+        "description": "Predict Sunday race finish position, podium probability, and points probability from starting grid position using ML models and circuit physics.",
         "parameters": {
             "type": "object",
             "properties": {
                 "driver_id": {"type": "string", "description": "Driver code e.g. VER, NOR, HAM"},
-                "grid_position": {"type": "integer", "description": "Starting grid slot (1 to 20)"}
+                "grid_position": {"type": "integer", "description": "Starting grid slot (1 to 20)"},
+                "event_name": {"type": "string", "description": "Grand Prix name e.g. 'Monaco Grand Prix', 'Italian Grand Prix'"}
             },
             "required": ["driver_id", "grid_position"]
+        }
+    },
+    {
+        "name": "circuit_profile",
+        "description": "Get physical downforce cluster, tire stress, and micro-sector apex benchmarks for an F1 circuit.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "circuit_or_event": {"type": "string", "description": "Grand Prix or circuit name (e.g. 'Monza', 'Monaco', 'Silverstone')"}
+            },
+            "required": ["circuit_or_event"]
         }
     }
 ]
