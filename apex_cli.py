@@ -42,6 +42,57 @@ from dynamic_analyst import DynamicF1AnalystSandbox
 console = Console()
 sandbox = DynamicF1AnalystSandbox()
 
+def clean_terminal_text(text: str) -> str:
+    """
+    Sanitize and render raw LaTeX, math symbols, and escaped characters
+    into clean, readable Unicode terminal characters for Windows console.
+    Converts: ($\mu_{\text{peak}}$) -> (μ_peak), $\Delta t \le +0.250\text{s}$ -> Δt ≤ +0.250s, etc.
+    """
+    if not text:
+        return ""
+    import re
+    # Greek and mathematical symbol map
+    math_map = {
+        r'\mu': 'μ',
+        r'\sigma': 'σ',
+        r'\Delta': 'Δ',
+        r'\delta': 'δ',
+        r'\theta': 'θ',
+        r'\lambda': 'λ',
+        r'\alpha': 'α',
+        r'\beta': 'β',
+        r'\le': '≤',
+        r'\ge': '≥',
+        r'\pm': '±',
+        r'\times': '×',
+        r'\approx': '≈',
+        r'\ne': '≠',
+        r'\to': '→',
+        r'^\circ': '°',
+        r'\degree': '°',
+        r'\bar': '',
+        r'\cdot': '·',
+        r'\sqrt': '√',
+    }
+    
+    out = text
+    for sym, uni in math_map.items():
+        out = out.replace(sym, uni)
+        
+    # Remove \text{...} wrappers -> ...
+    out = re.sub(r'\\text\{([^}]+)\}', r'\1', out)
+    # Remove \frac{a}{b} -> a/b
+    out = re.sub(r'\\frac\{([^}]+)\}\{([^}]+)\}', r'\1/\2', out)
+    # Remove leftover math dollar signs: $...$ -> ...
+    out = re.sub(r'\$([^\$]+)\$', r'\1', out)
+    out = out.replace('$', '')
+    # Remove remaining curly braces from subscripts/superscripts: _{peak} -> _peak
+    out = re.sub(r'\_\{([^}]+)\}', r'_\1', out)
+    out = re.sub(r'\^\{([^}]+)\}', r'^\1', out)
+    # Remove bare backslashes before plain alphanumeric tokens
+    out = re.sub(r'\\([a-zA-Z]+)', r'\1', out)
+    return out
+
 COMMANDS = [
     "/predict",
     "/standings",
@@ -386,7 +437,8 @@ def handle_natural_query(user_query: str):
                 )
                 if res.status_code == 200:
                     ans = res.json().get("response", "")
-                    console.print(Panel(Markdown(ans), title="APEX AI — Fine-Tuned Llama-3 (Colab)", border_style="green"))
+                    cleaned_ans = clean_terminal_text(ans)
+                    console.print(Panel(Markdown(cleaned_ans), title="APEX AI — Fine-Tuned Llama-3 (Colab)", border_style="green"))
                     return
                 else:
                     console.print(f"[bold red]Colab server returned error {res.status_code}: {res.text}[/bold red]")
@@ -399,7 +451,8 @@ def handle_natural_query(user_query: str):
     with console.status("[bold cyan]Analyzing query & routing to local APEX AI Engine...", spinner="dots"):
         time.sleep(0.3)
         response = ask_apex(user_query)
-    console.print(Panel(response, title="APEX AI Response (Local Hybrid Engine)", border_style="cyan"))
+    cleaned_local = clean_terminal_text(response)
+    console.print(Panel(Markdown(cleaned_local), title="APEX AI Response (Local Hybrid Engine)", border_style="cyan"))
 
 
 def main():
