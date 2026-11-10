@@ -1,6 +1,6 @@
 # APEX AI: Reproducibility & Replication Protocol
 
-This document provides a comprehensive, deterministic replication protocol for the empirical results, physical telemetry models, and publication figures presented in the **APEX AI** research manuscript.
+This document provides a comprehensive, deterministic replication protocol for the empirical results, physical telemetry models, and benchmark metrics of the **APEX AI** architecture.
 
 ---
 
@@ -11,7 +11,7 @@ The experiments and benchmarks were executed and validated under the following c
 - **Processor**: AMD Ryzen 9 5950X (16 cores, 32 threads, 3.4 GHz base) or Intel Core i7/i9 equivalent
 - **System Memory**: 32 GB DDR4/DDR5 RAM (minimum 16 GB required for expanding walk-forward folds)
 - **GPU Acceleration**: NVIDIA GeForce RTX 3080 (10 GB VRAM) / NVIDIA Tesla T4 (16 GB VRAM on Google Colab)
-- **Python Version**: Python 3.12 or Python 3.14 (Verified with standard CPython distribution)
+- **Python Version**: Python 3.10, 3.11, or 3.12+ (Verified with standard CPython distribution)
 - **CUDA Runtime**: CUDA 12.1+ / cuDNN 8.9+ (optional for XGBoost GPU trees, CPU fallback fully supported)
 
 ---
@@ -23,7 +23,7 @@ Clone the repository and instantiate an isolated virtual environment:
 ```bash
 # 1. Clone repository
 git clone https://github.com/bhxvxsh/apex-ai.git
-cd APEX_AI
+cd apex-ai
 
 # 2. Create virtual environment
 python -m venv venv
@@ -38,15 +38,15 @@ source venv/bin/activate
 
 # 4. Install dependencies
 pip install --upgrade pip
-pip install -r 00_Setup/requirements.txt
+pip install -r requirements.txt
 ```
 
 Core library dependencies:
-- `numpy>=1.26.0`, `scipy>=1.12.0`, `pandas>=2.2.0`
-- `scikit-learn>=1.4.0`, `xgboost>=2.0.0`, `lightgbm>=4.3.0`
-- `matplotlib>=3.8.0`, `seaborn>=0.13.0`
+- `numpy>=1.24.0`, `scipy>=1.10.0`, `pandas>=2.0.0`
+- `scikit-learn>=1.3.0`, `xgboost>=2.0.0`, `lightgbm>=4.0.0`
+- `matplotlib>=3.7.0`, `seaborn>=0.12.0`
 - `fastf1>=3.4.0`
-- `pytest>=8.0.0`
+- `pytest>=7.4.0`
 
 ---
 
@@ -75,11 +75,7 @@ print('Database integrity verified successfully.')
 ### Stage 1: Feature Engineering & Circuit Clustering
 Construct the 23-feature training matrix combining longitudinal form, micro-sector telemetry dynamics, and aerodynamic taxonomy:
 ```bash
-# Run circuit aerodynamic clustering
-python 03_Training_Dataset/circuit_taxonomy.py
-
-# Extract micro-sector dynamics and compile full features
-python 03_Training_Dataset/micro_sector_dynamics.py
+python 03_Training_Dataset/build_features.py
 ```
 *Generated Artifact*: `03_Training_Dataset/full_features.csv` (1,278 rows, 40 total columns including 23 model features).
 
@@ -99,21 +95,14 @@ python 04_Models/walk_forward_cv.py
 *Generated Artifact*: `04_Models/walk_forward_metrics.json`.
 *Verification Assertion*: Status-Quo Grid MAE = 2.711, APEX AI Ranked XGBoost MAE = 2.191, Relative Gain = 19.16%, $p = 6.24 \times 10^{-10}$.
 
-### Stage 4: Publication Figure Generation (One-Command)
-Generate all 7 publication figures in both vector `.pdf` and raster 300+ DPI `.png` format:
+### Stage 4: Comprehensive Test Verification
+Execute the automated test suite to ensure 100% compliance across all data invariants and model metrics:
 ```bash
-python 06_Research_Paper/scripts/generate_all_figures.py
-```
-*Target Directory*: `06_Research_Paper/figures/` (Figures 1 through 7 audited and rendered cleanly without typography overlap).
-
-### Stage 5: Comprehensive Test Verification
-Execute the automated test suite to ensure 100% compliance across all data invariants, manuscript claims, and publication figures:
-```bash
-# Execute full 19-test IEEE research paper test suite
-pytest tests/test_e2e_research_paper.py -v
-
-# Or run master test runner
+# Execute master test runner
 python tests/run_e2e_tests.py
+
+# Or via pytest
+pytest tests/ -v
 ```
 
 ---
@@ -136,9 +125,7 @@ python tests/run_e2e_tests.py
 | **Points ROC-AUC** | `81.78%` | $\pm 0.20\%$ | `04_Models/baseline_metrics_summary.json` |
 | **Points Accuracy** | `75.22%` | $\pm 0.20\%$ | `04_Models/baseline_metrics_summary.json` |
 | **QLoRA Trainable Params** | `41,943,040` | Exact integer match | `07_Notebooks/apex_ai_master_colab.ipynb` |
-| **Figure Raster Density** | $\ge 300\text{ DPI}$ | Minimum threshold | `06_Research_Paper/figures/*.png` |
-| **Figure Vector Validity** | `%PDF-1.4` header | Strict format header | `06_Research_Paper/figures/*.pdf` |
-| **E2E Test Suite Status** | 19 / 19 Passed | 0 failures, 0 errors | `tests/test_e2e_research_paper.py` |
+| **Core Test Suite Status** | 8 / 8 Passed | 0 failures, 0 errors | `tests/test_apex_ai.py` |
 
 ---
 

@@ -2,18 +2,16 @@
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%20%7C%203.14-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![IEEE Paper](https://img.shields.io/badge/IEEE%20TNNLS-Preprint-red.svg)](06_Research_Paper/PAPER.md)
-[![Tests Passing](https://img.shields.io/badge/tests-19%2F19%20passing-brightgreen.svg)](tests/)
+[![Tests Passing](https://img.shields.io/badge/tests-8%2F8%20passing-brightgreen.svg)](tests/)
 [![Walk-Forward Folds](https://img.shields.io/badge/Walk--Forward-49%20Folds-orange.svg)](04_Models/walk_forward_metrics.json)
-[![High-Res Figures](https://img.shields.io/badge/Figures-300%2B%20DPI%20PDF%2FPNG-purple.svg)](06_Research_Paper/figures/)
 
-**APEX AI** is an open-source, publication-grade computational intelligence architecture designed for real-time Formula 1 race outcome forecasting and strategic decision synthesis. By bridging high-frequency sensor telemetry (10 Hz car dynamics, throttle, braking, and gear traces), physical circuit aerodynamic regimes, discrete intra-race ordinal ranking, and tool-augmented Large Language Model (LLM) agents, APEX AI replaces static qualifying heuristics with calibrated, physically grounded dynamic predictions.
+**APEX AI** is an open-source computational intelligence architecture designed for real-time Formula 1 race outcome forecasting and strategic decision synthesis. By bridging high-frequency sensor telemetry (10 Hz car dynamics, throttle, braking, and gear traces), physical circuit aerodynamic regimes, discrete intra-race ordinal ranking, and tool-augmented Large Language Model (LLM) agents, APEX AI replaces static qualifying heuristics with calibrated, physically grounded dynamic predictions.
 
 ---
 
 ## System Architecture
 
-![APEX AI Architecture](06_Research_Paper/figures/fig1_system_architecture.png)
+![APEX AI Architecture](assets/system_architecture.png)
 
 ```
 ====================================================================================================
@@ -52,10 +50,10 @@
   +------------------------------------------------------------------------------------------------+
                                                   │
                                                   ▼
-  [ TIER 5: STRATEGY SYNTHESIS & PUBLICATION BRIEF ]
+  [ TIER 5: STRATEGY SYNTHESIS & DECISION EXECUTION ]
   +------------------------------------------------------------------------------------------------+
   |  • Tactical Undercut / Overcut Windows, Thermal Cliff Warnings, Stint Length Optimizations     |
-  |  • Full IEEE Transactions Research Manuscript & Strategic Decision Briefs                      |
+  |  • Automated Strategy Decision Briefs, In-Race ReAct Guidance & Real-Time Driver Reports       |
   +------------------------------------------------------------------------------------------------+
 ====================================================================================================
 ```
@@ -154,57 +152,23 @@ pip install -r requirements.txt
 ### 1. Inquire Real-Time Race Strategy (CLI)
 Query the trained predictive core for driver finishing predictions, tactical pace delta, and strategy recommendations:
 ```bash
-python 05_Analytics/apex_cli.py --driver "NOR" --circuit "Silverstone" --session "Race"
+python apex_cli.py --driver "NOR" --circuit "Silverstone" --session "Race"
 ```
 
 ### 2. Natural Language Strategic Reasoning (Tool-Augmented ReAct Agent)
 Pose high-dimensional race strategy dilemmas to the autonomous analyst:
 ```bash
-python 05_Analytics/ask_apex_cli.py "Evaluate whether Lando Norris should pit for Hard tires on Lap 32 during a Safety Car at Silverstone, given an ambient track temperature of 38C and an expected 18-second pit loss delta."
+python ask_apex_cli.py "Evaluate whether Lando Norris should pit for Hard tires on Lap 32 during a Safety Car at Silverstone, given an ambient track temperature of 38C and an expected 18-second pit loss delta."
 ```
 
-### 3. Run the Full Analytics Suite
-```bash
-python 05_Analytics/run_analytics_suite.py
-```
-
----
-
-## Research Paper & Publication Assets
-
-The complete academic manuscript, peer-reviewed bibliography, and publication assets are available in [`06_Research_Paper/`](06_Research_Paper/):
-
-| Asset | Description | Location |
-|:---|:---|:---:|
-| **Manuscript (Markdown)** | Full IEEE Transactions formatted article with methodology, empirical proofs, and limitations. | [`PAPER.md`](06_Research_Paper/PAPER.md) |
-| **Manuscript (LaTeX)** | Official IEEEtran LaTeX source code. | [`main.tex`](06_Research_Paper/main.tex) |
-| **Bibliography** | 28 peer-reviewed citations covering telemetry, aerodynamics, gradient boosting, and LLMs. | [`references.bib`](06_Research_Paper/references.bib) |
-| **Style & Class** | Official IEEE Transactions styling and citation files. | `IEEEtran.cls`, `IEEEtran.bst` |
-| **Figures Suite** | 7 high-resolution figures in both vector PDF and 300+ DPI PNG format. | [`figures/`](06_Research_Paper/figures/) |
-| **Figure Generator** | Standalone deterministic Python script rendering Figures 1–7. | [`scripts/generate_all_figures.py`](06_Research_Paper/scripts/generate_all_figures.py) |
-
----
-
-## Reproducibility & Testing
-
-### Generate All Publication Figures (300+ DPI Vector PDF & PNG)
-To re-render all 7 publication figures with zero typographic collisions:
-```bash
-python 06_Research_Paper/scripts/generate_all_figures.py
-```
-*Output*: Audits and renders Figures 1 through 7 in both vector `.pdf` and 300+ DPI raster `.png` format in `06_Research_Paper/figures/`.
-
-### Run Automated Verification Test Suite (19/19 Tests)
-APEX AI maintains a rigorous test suite validating figure typography, empirical assertions, LaTeX syntax, and data invariants:
+### 3. Run Automated System Verification Suite
+Execute the built-in test suite to verify feature matrix integrity, model metrics, and CLI syntax:
 ```bash
 # Execute master test runner:
 python tests/run_e2e_tests.py
 
-# Run only specific test tier (e.g. Tier 1):
-python tests/run_e2e_tests.py --tier 1
-
-# Standard pytest execution:
-pytest tests/test_e2e_research_paper.py -v
+# Or via pytest:
+pytest tests/ -v
 ```
 
 ---
@@ -213,6 +177,8 @@ pytest tests/test_e2e_research_paper.py -v
 
 ```
 APEX_AI/
+├── assets/                            # Architecture diagrams & visual assets
+│   └── system_architecture.png        # APEX AI end-to-end pipeline overview
 ├── 00_Setup/                          # Environment bootstrapping & data pipelines
 │   ├── clean_data.py                  # Telemetry normalization and cleaning
 │   ├── download_fastf1.py             # FIA & FastF1 API ingestion pipeline
@@ -220,10 +186,12 @@ APEX_AI/
 ├── 01_Data_Raw/                       # FastF1 raw API caching layer (gitignored)
 ├── 02_Data_Processed/                 # SQLite database (f1.db: 64 GPs, 1,119 finishers)
 ├── 03_Training_Dataset/               # Telemetry engineering & circuit taxonomy
-│   ├── circuit_taxonomy.py            # Physical 4-cluster aerodynamic regime mapping
-│   ├── micro_sector_dynamics.py       # High-frequency kinematic feature extractors
-│   ├── f1_technical_alpaca.json       # Alpaca-format QLoRA fine-tuning dataset
-│   └── full_features.csv              # Curated 23-feature training matrix
+│   ├── build_features.py              # Feature matrix engineering script
+│   ├── generate_finetune_dataset.py   # QLoRA instruction dataset generator
+│   ├── f1_technical_alpaca.json       # Alpaca-format fine-tuning dataset
+│   ├── full_features.csv              # Curated 23-feature training matrix
+│   ├── train_dataset.csv              # Training split (2023–2024 seasons)
+│   └── test_dataset.csv               # Held-out evaluation split (2025 season)
 ├── 04_Models/                         # Supervised ML algorithms & walk-forward engine
 │   ├── train_baseline.py              # Baseline regression & classification model training
 │   ├── evaluate_models.py             # Performance metric computation & ROC-AUC curves
@@ -232,25 +200,23 @@ APEX_AI/
 │   └── walk_forward_metrics.json      # Complete 49-fold out-of-sample metrics & statistics
 ├── 05_Analytics/                      # Autonomous agent reasoning & interactive tools
 │   ├── react_agent.py                 # 5-step ReAct reasoning agent implementation
-│   ├── tool_maker.py                  # Dynamic F1 Analyst Sandbox (LATM execution environment)
-│   ├── apex_cli.py                    # Interactive strategy query CLI
-│   ├── ask_apex_cli.py                # Natural language telemetry query CLI
-│   └── run_analytics_suite.py         # Master analytics pipeline runner
-├── 06_Research_Paper/                 # IEEE Transactions publication manuscript & assets
-│   ├── main.tex                       # IEEEtran LaTeX source code
-│   ├── PAPER.md                       # Comprehensive markdown publication draft
-│   ├── references.bib                 # 28 peer-reviewed BibTeX citations
-│   ├── IEEEtran.cls / .bst            # Official IEEE Transactions styling files
-│   ├── figures/                       # High-resolution vector PDF & 300+ DPI PNG figures (fig1–fig7)
-│   └── scripts/                       # Reproducible Python figure generation scripts
-├── 07_Notebooks/                      # Colab fine-tuning & experimental research notebooks
+│   ├── dynamic_analyst.py             # Dynamic execution sandbox (LATM)
+│   ├── circuit_clusters.py            # Aerodynamic regime clustering utilities
+│   ├── consistency.py                 # Stint lap time consistency analytics
+│   ├── driver_performance.py          # Career and rolling driver form models
+│   ├── qualifying_deltas.py           # Micro-sector qualifying intervals
+│   ├── tools.py                       # Unified function registry for ReAct agent
+│   └── visualizations.py              # High-dimensional telemetry plotting
+├── 07_Notebooks/                      # Fine-tuning & experimental research notebooks
 │   └── apex_ai_master_colab.ipynb     # 4-bit QLoRA Llama-3-8B fine-tuning notebook
 ├── tests/                             # Comprehensive test automation suite
-│   ├── test_e2e_research_paper.py     # 19 end-to-end research paper tests across 4 tiers
-│   └── run_e2e_tests.py               # Master test runner with multi-tier CLI flags
+│   ├── test_apex_ai.py                # Core software verification test suite
+│   └── run_e2e_tests.py               # Test runner
+├── apex_cli.py                        # Interactive strategy query CLI
+├── ask_apex_cli.py                    # Natural language telemetry query CLI
 ├── .gitignore                         # Git exclusion rules
 ├── LICENSE                            # MIT License
-├── README.md                          # Repository documentation & publication overview
+├── README.md                          # Repository documentation & architecture overview
 ├── RESULTS_SUMMARY.md                 # Standalone single-page comparative benchmark table
 ├── REPRODUCIBILITY.md                 # Root reproducibility & execution protocol
 └── requirements.txt                   # Root pinned Python dependencies
@@ -258,18 +224,16 @@ APEX_AI/
 
 ---
 
-## Citation & Academic Attribution
+## Attribution
 
-If you utilize APEX AI's telemetry features, aerodynamic taxonomy, walk-forward validation framework, or benchmark models in your research, please cite our paper:
+If you utilize APEX AI's telemetry feature matrix, aerodynamic clustering taxonomy, or walk-forward validation framework in your projects, please attribute:
 
 ```bibtex
-@article{apexai2026,
-  author    = {Bhavish U. S. and {APEX AI Research Group}},
-  title     = {{APEX AI}: Multi-Modal Telemetry Ingestion, Physical Aerodynamic Clustering, and Tool-Augmented Reasoning for Real-Time Formula 1 Race Strategy},
-  journal   = {IEEE Transactions on Neural Networks and Learning Systems (Preprint)},
-  year      = {2026},
-  pages     = {1--16},
-  url       = {https://github.com/bhxvxsh/apex-ai}
+@software{apex_ai_2026,
+  author = {Bhavish U. S.},
+  title  = {{APEX AI}: Multi-Modal Telemetry Ingestion, Physical Aerodynamic Clustering, and Tool-Augmented Reasoning for Real-Time Formula 1 Race Strategy},
+  year   = {2026},
+  url    = {https://github.com/bhxvxsh/apex-ai}
 }
 ```
 

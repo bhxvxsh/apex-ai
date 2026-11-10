@@ -46,6 +46,8 @@ desktop.ini
 *.sqlite3
 *.f1.db
 
-# Private Author Collateral (keep out of public repo)
+# Private Author & Publication Materials (kept private, outside repo)
+06_Research_Paper/
 08_Academic_Submission/
 *outreach*
+*manuscript*
