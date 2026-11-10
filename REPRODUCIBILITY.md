@@ -107,16 +107,13 @@ python 06_Research_Paper/scripts/generate_all_figures.py
 *Target Directory*: `06_Research_Paper/figures/` (Figures 1 through 7 audited and rendered cleanly without typography overlap).
 
 ### Stage 5: Comprehensive Test Verification
-Execute the test suites to ensure 100% compliance across all data invariants, manuscript claims, and package deliverables:
+Execute the automated test suite to ensure 100% compliance across all data invariants, manuscript claims, and publication figures:
 ```bash
-# 1. Execute full 19-test IEEE research paper test suite
+# Execute full 19-test IEEE research paper test suite
 pytest tests/test_e2e_research_paper.py -v
 
-# 2. Execute companion 8-test academic outreach test suite
-pytest tests/test_academic_submission.py -v
-
-# 3. Or run master unified test runner
-python tests/run_e2e_tests.py --suite all
+# Or run master test runner
+python tests/run_e2e_tests.py
 ```
 
 ---
@@ -142,9 +139,9 @@ python tests/run_e2e_tests.py --suite all
 | **Figure Raster Density** | $\ge 300\text{ DPI}$ | Minimum threshold | `06_Research_Paper/figures/*.png` |
 | **Figure Vector Validity** | `%PDF-1.4` header | Strict format header | `06_Research_Paper/figures/*.pdf` |
 | **E2E Test Suite Status** | 19 / 19 Passed | 0 failures, 0 errors | `tests/test_e2e_research_paper.py` |
-| **Academic Suite Status** | 8 / 8 Passed | 0 failures, 0 errors | `tests/test_academic_submission.py` |
 
 ---
 
-## 6. Contact & Support
-For replication inquiries or telemetry data access questions, please open a GitHub Issue or reach out to the corresponding authors via `08_Academic_Submission/MENTOR_COVER_LETTER.md`.
+## 6. Contact & Issues
+For replication inquiries, bug reports, or telemetry data access questions, please open an issue on GitHub:
+https://github.com/bhxvxsh/yeah-def-my-nyc-project/issues

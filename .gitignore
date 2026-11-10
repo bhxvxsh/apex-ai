@@ -45,3 +45,7 @@ desktop.ini
 *.sqlite
 *.sqlite3
 *.f1.db
+
+# Private Author Collateral (keep out of public repo)
+08_Academic_Submission/
+*outreach*

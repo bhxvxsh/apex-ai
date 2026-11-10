@@ -24,3 +24,4 @@ prompt_toolkit>=3.0.0
 
 # Automated Verification & Testing
 pytest>=7.4.0
+

@@ -3,10 +3,9 @@
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%20%7C%203.14-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![IEEE Paper](https://img.shields.io/badge/IEEE%20TNNLS-Preprint-red.svg)](06_Research_Paper/PAPER.md)
-[![Tests Passing](https://img.shields.io/badge/tests-27%2F27%20passing-brightgreen.svg)](tests/)
+[![Tests Passing](https://img.shields.io/badge/tests-19%2F19%20passing-brightgreen.svg)](tests/)
 [![Walk-Forward Folds](https://img.shields.io/badge/Walk--Forward-49%20Folds-orange.svg)](04_Models/walk_forward_metrics.json)
 [![High-Res Figures](https://img.shields.io/badge/Figures-300%2B%20DPI%20PDF%2FPNG-purple.svg)](06_Research_Paper/figures/)
-[![Mentor Outreach](https://img.shields.io/badge/Outreach%20Package-Mentor%20Ready-blueviolet.svg)](08_Academic_Submission/)
 
 **APEX AI** is an open-source, publication-grade computational intelligence architecture designed for real-time Formula 1 race outcome forecasting and strategic decision synthesis. By bridging high-frequency sensor telemetry (10 Hz car dynamics, throttle, braking, and gear traces), physical circuit aerodynamic regimes, discrete intra-race ordinal ranking, and tool-augmented Large Language Model (LLM) agents, APEX AI replaces static qualifying heuristics with calibrated, physically grounded dynamic predictions.
 
@@ -56,7 +55,7 @@
   [ TIER 5: STRATEGY SYNTHESIS & PUBLICATION BRIEF ]
   +------------------------------------------------------------------------------------------------+
   |  • Tactical Undercut / Overcut Windows, Thermal Cliff Warnings, Stint Length Optimizations     |
-  |  • Full IEEE Transactions Research Manuscript & Mentor Submission Package                      |
+  |  • Full IEEE Transactions Research Manuscript & Strategic Decision Briefs                      |
   +------------------------------------------------------------------------------------------------+
 ====================================================================================================
 ```
@@ -164,26 +163,25 @@ Pose high-dimensional race strategy dilemmas to the autonomous analyst:
 python 05_Analytics/ask_apex_cli.py "Evaluate whether Lando Norris should pit for Hard tires on Lap 32 during a Safety Car at Silverstone, given an ambient track temperature of 38C and an expected 18-second pit loss delta."
 ```
 
-### 3. Run the Full Analytics & Verification Suite
+### 3. Run the Full Analytics Suite
 ```bash
 python 05_Analytics/run_analytics_suite.py
 ```
 
 ---
 
-## Academic Outreach & Mentor Package
+## Research Paper & Publication Assets
 
-For mentors, professors, and peer reviewers, all formal research collateral is centralized in [`08_Academic_Submission/`](08_Academic_Submission/):
+The complete academic manuscript, peer-reviewed bibliography, and publication assets are available in [`06_Research_Paper/`](06_Research_Paper/):
 
-| Document | Purpose & Description | Link |
+| Asset | Description | Location |
 |:---|:---|:---:|
-| **Research Abstract** | Standalone 225-word summary detailing the research question, physical clustering, QLoRA ReAct agent, and empirical findings. | [`ABSTRACT.md`](08_Academic_Submission/ABSTRACT.md) |
-| **Research Paper Draft** | Full IEEE Transactions-format manuscript (Introduction, System Architecture, Telemetry Features, ML Core, ReAct Sandbox, Walk-Forward Results, Limitations). | [`PAPER.md`](08_Academic_Submission/PAPER.md) |
-| **IEEE LaTeX Source** | Complete compilation package (`main.tex`, `references.bib` with 28 citations, `IEEEtran.cls`, `IEEEtran.bst`). | [`main.tex`](08_Academic_Submission/main.tex) |
-| **Results Summary Table** | Single-page comparative benchmark matrix contrasting 7 model paradigms across 8 statistical metrics. | [`RESULTS_SUMMARY.md`](08_Academic_Submission/RESULTS_SUMMARY.md) |
-| **Reproducibility Protocol** | Deterministic replication guide for environment bootstrapping, model training, and figure generation. | [`REPRODUCIBILITY.md`](08_Academic_Submission/REPRODUCIBILITY.md) |
-| **Mentor Outreach Letter** | Formal academic cover letter (Tier A) and high-impact email template (Tier B) for faculty acknowledgment. | [`MENTOR_COVER_LETTER.md`](08_Academic_Submission/MENTOR_COVER_LETTER.md) |
-| **Publication Figures** | Complete suite of 7 high-resolution figures in both vector PDF and 300+ DPI PNG formats. | [`figures/`](08_Academic_Submission/figures/) |
+| **Manuscript (Markdown)** | Full IEEE Transactions formatted article with methodology, empirical proofs, and limitations. | [`PAPER.md`](06_Research_Paper/PAPER.md) |
+| **Manuscript (LaTeX)** | Official IEEEtran LaTeX source code. | [`main.tex`](06_Research_Paper/main.tex) |
+| **Bibliography** | 28 peer-reviewed citations covering telemetry, aerodynamics, gradient boosting, and LLMs. | [`references.bib`](06_Research_Paper/references.bib) |
+| **Style & Class** | Official IEEE Transactions styling and citation files. | `IEEEtran.cls`, `IEEEtran.bst` |
+| **Figures Suite** | 7 high-resolution figures in both vector PDF and 300+ DPI PNG format. | [`figures/`](06_Research_Paper/figures/) |
+| **Figure Generator** | Standalone deterministic Python script rendering Figures 1–7. | [`scripts/generate_all_figures.py`](06_Research_Paper/scripts/generate_all_figures.py) |
 
 ---
 
@@ -194,20 +192,19 @@ To re-render all 7 publication figures with zero typographic collisions:
 ```bash
 python 06_Research_Paper/scripts/generate_all_figures.py
 ```
-*Output*: Generates both vector `.pdf` and 300+ DPI raster `.png` assets in `06_Research_Paper/figures/` and `08_Academic_Submission/figures/`.
+*Output*: Audits and renders Figures 1 through 7 in both vector `.pdf` and 300+ DPI raster `.png` format in `06_Research_Paper/figures/`.
 
-### Run Automated Verification Test Suite (27/27 Tests)
-APEX AI maintains a rigorous test suite validating figure typography, empirical assertions, LaTeX syntax, and academic requirements:
+### Run Automated Verification Test Suite (19/19 Tests)
+APEX AI maintains a rigorous test suite validating figure typography, empirical assertions, LaTeX syntax, and data invariants:
 ```bash
-# Execute master test runner (runs all 27 tests):
-python tests/run_e2e_tests.py --suite all
+# Execute master test runner:
+python tests/run_e2e_tests.py
 
-# Or run individual test suites:
-python tests/run_e2e_tests.py --suite paper        # 19 IEEE research paper tests
-python tests/run_e2e_tests.py --suite submission   # 8 academic outreach tests
+# Run only specific test tier (e.g. Tier 1):
+python tests/run_e2e_tests.py --tier 1
 
 # Standard pytest execution:
-pytest tests/ -v
+pytest tests/test_e2e_research_paper.py -v
 ```
 
 ---
@@ -248,20 +245,9 @@ APEX_AI/
 │   └── scripts/                       # Reproducible Python figure generation scripts
 ├── 07_Notebooks/                      # Colab fine-tuning & experimental research notebooks
 │   └── apex_ai_master_colab.ipynb     # 4-bit QLoRA Llama-3-8B fine-tuning notebook
-├── 08_Academic_Submission/            # Autonomous academic outreach & mentor package
-│   ├── ABSTRACT.md                    # Standalone 225-word research abstract
-│   ├── PAPER.md                       # Formatted mentor-ready IEEE research manuscript
-│   ├── main.tex                       # IEEEtran LaTeX manuscript source
-│   ├── references.bib                 # 28 peer-reviewed BibTeX citations
-│   ├── IEEEtran.cls / .bst            # Official IEEE Transactions styling files
-│   ├── RESULTS_SUMMARY.md             # Single-page 7-model comparative results table
-│   ├── REPRODUCIBILITY.md             # Standalone execution & reproduction guide
-│   ├── MENTOR_COVER_LETTER.md         # Faculty outreach cover letter & cold email template
-│   └── figures/                       # Complete high-resolution publication figures
 ├── tests/                             # Comprehensive test automation suite
 │   ├── test_e2e_research_paper.py     # 19 end-to-end research paper tests across 4 tiers
-│   ├── test_academic_submission.py    # 8 companion academic outreach verification tests
-│   └── run_e2e_tests.py               # Master test runner with multi-suite CLI flags
+│   └── run_e2e_tests.py               # Master test runner with multi-tier CLI flags
 ├── .gitignore                         # Git exclusion rules
 ├── LICENSE                            # MIT License
 ├── README.md                          # Repository documentation & publication overview
