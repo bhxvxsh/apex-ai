@@ -22,7 +22,7 @@ Clone the repository and instantiate an isolated virtual environment:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/bhxvxsh/yeah-def-my-nyc-project.git
+git clone https://github.com/bhxvxsh/apex-ai.git
 cd APEX_AI
 
 # 2. Create virtual environment
@@ -144,4 +144,4 @@ python tests/run_e2e_tests.py
 
 ## 6. Contact & Issues
 For replication inquiries, bug reports, or telemetry data access questions, please open an issue on GitHub:
-https://github.com/bhxvxsh/yeah-def-my-nyc-project/issues
+https://github.com/bhxvxsh/apex-ai/issues

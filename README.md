@@ -128,8 +128,8 @@ The predictive models operate on a curated 23-feature representation categorized
 ### Clone & Install
 ```bash
 # Clone the repository
-git clone https://github.com/bhxvxsh/yeah-def-my-nyc-project.git
-cd yeah-def-my-nyc-project
+git clone https://github.com/bhxvxsh/apex-ai.git
+cd apex-ai
 
 # Instantiate isolated virtual environment
 python -m venv venv
@@ -269,7 +269,7 @@ If you utilize APEX AI's telemetry features, aerodynamic taxonomy, walk-forward 
   journal   = {IEEE Transactions on Neural Networks and Learning Systems (Preprint)},
   year      = {2026},
   pages     = {1--16},
-  url       = {https://github.com/bhxvxsh/yeah-def-my-nyc-project}
+  url       = {https://github.com/bhxvxsh/apex-ai}
 }
 ```
 
