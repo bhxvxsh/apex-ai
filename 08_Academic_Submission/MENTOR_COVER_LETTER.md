@@ -14,7 +14,7 @@ Bhavish U. S. (Corresponding Author)
 Department of Autonomous Systems & Computational Engineering  
 Formula Analytics Laboratory  
 Email: bhavish@apex-ai-research.org / research@apex-f1.org  
-Project Repository: https://github.com/APEX-AI-Research/APEX_AI  
+Project Repository: https://github.com/bhxvxsh/yeah-def-my-nyc-project  
 
 **To**:  
 Distinguished Faculty Mentor / Principal Investigator / Senior Reviewer  
@@ -83,7 +83,7 @@ We tackle the challenge of in-race strategy prediction by replacing static quali
 - **Sub-Second Latency**: 14.2 ms ML inference, 1.62 s agent reasoning cycle on edge hardware.
 
 We have assembled a self-contained Academic Outreach Package including the full IEEE draft (`PAPER.md` & `main.tex`), single-page results summary (`RESULTS_SUMMARY.md`), and one-command reproduction guide (`REPRODUCIBILITY.md`):  
-**Repository**: https://github.com/APEX-AI-Research/APEX_AI
+**Repository**: https://github.com/bhxvxsh/yeah-def-my-nyc-project
 
 Would you or a member of your lab be open to offering brief feedback on our walk-forward validation methodology, or discussing potential collaboration / mentorship as we prepare our IEEE submission?
 

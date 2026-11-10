@@ -3,23 +3,42 @@
 01_Data_Raw/
 02_Data_Processed/
 
-# Python cache files
+# Python cache & build files
 __pycache__/
 *.pyc
 *.pyo
 *.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Virtual environments
 venv/
 env/
 .venv/
+ENV/
+
+# IDE & Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
 
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# Logs
+# Logs & Temporary files
 *.log
+*.tmp
+*.bak
 
 # SQLite database
 *.db

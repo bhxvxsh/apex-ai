@@ -1,13 +1,14 @@
 # APEX AI: Multi-Modal Telemetry Ingestion, Physical Aerodynamic Clustering, and Tool-Augmented Reasoning for Real-Time Formula 1 Race Strategy
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%20%7C%203.14-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![IEEE Paper](https://img.shields.io/badge/IEEE%20TNNLS-Preprint-red.svg)](06_Research_Paper/PAPER.md)
 [![Tests Passing](https://img.shields.io/badge/tests-27%2F27%20passing-brightgreen.svg)](tests/)
 [![Walk-Forward Folds](https://img.shields.io/badge/Walk--Forward-49%20Folds-orange.svg)](04_Models/walk_forward_metrics.json)
 [![High-Res Figures](https://img.shields.io/badge/Figures-300%2B%20DPI%20PDF%2FPNG-purple.svg)](06_Research_Paper/figures/)
+[![Mentor Outreach](https://img.shields.io/badge/Outreach%20Package-Mentor%20Ready-blueviolet.svg)](08_Academic_Submission/)
 
-**APEX AI** is an open-source, publication-grade computational intelligence system for real-time Formula 1 race outcome prediction and strategic decision synthesis. By bridging high-frequency sensor telemetry, physical circuit aerodynamic regimes, discrete ordinal ranking, and tool-augmented Large Language Model (LLM) agents, APEX AI replaces static Saturday qualifying heuristics with calibrated, physically grounded dynamic predictions.
+**APEX AI** is an open-source, publication-grade computational intelligence architecture designed for real-time Formula 1 race outcome forecasting and strategic decision synthesis. By bridging high-frequency sensor telemetry (10 Hz car dynamics, throttle, braking, and gear traces), physical circuit aerodynamic regimes, discrete intra-race ordinal ranking, and tool-augmented Large Language Model (LLM) agents, APEX AI replaces static qualifying heuristics with calibrated, physically grounded dynamic predictions.
 
 ---
 
@@ -20,10 +21,10 @@
                                       APEX AI SYSTEM ARCHITECTURE
 ====================================================================================================
 
-  [ TIER 1: MULTI-MODAL DATA INGESTION ]
+  [ TIER 1: MULTI-MODAL DATA INGESTION & STORAGE ]
   +------------------------------------------------------------------------------------------------+
-  |  FIA Timing API & FastF1 Feeds  -->  High-Precision Telemetry Parsing  -->  f1.db (SQLite)    |
-  |  (1,278 Starts | 1,119 Finishers | 64 Grand Prix Events across 2023, 2024, and 2025 Seasons)   |
+  |  FIA Timing API & FastF1 Feeds  -->  High-Precision Telemetry Normalizer  -->  f1.db (SQLite)  |
+  |  (1,278 Race Starts | 1,119 Classified Finishers | 64 Grand Prix Events across 2023–2025)       |
   +------------------------------------------------------------------------------------------------+
                                                   │
                                                   ▼
@@ -35,7 +36,7 @@
   +------------------------------------------------------------------------------------------------+
                                                   │
                                                   ▼
-  [ TIER 3: SUPERVISED MACHINE LEARNING & WALK-FORWARD CROSS-VALIDATION ]
+  [ TIER 3: SUPERVISED MACHINE LEARNING & TEMPORAL WALK-FORWARD CV ]
   +------------------------------------------------------------------------------------------------+
   |  • 23-Feature Multi-Modal Ingestion Matrix (Longitudinal Form + Telemetry Kinematics)          |
   |  • 49 Sequential Out-of-Sample Grand Prix Folds (15-Event Warmup Kernel, 857 Finishes)         |
@@ -50,14 +51,46 @@
   |  • 5-Step ReAct Loop: Baseline Profile -> Track Aero -> ML Inference -> Reflection -> Strategy|
   |  • Dynamic F1 Analyst Sandbox (LATM): On-the-fly Python & SQL execution for novel scenarios   |
   +------------------------------------------------------------------------------------------------+
+                                                  │
+                                                  ▼
+  [ TIER 5: STRATEGY SYNTHESIS & PUBLICATION BRIEF ]
+  +------------------------------------------------------------------------------------------------+
+  |  • Tactical Undercut / Overcut Windows, Thermal Cliff Warnings, Stint Length Optimizations     |
+  |  • Full IEEE Transactions Research Manuscript & Mentor Submission Package                      |
+  +------------------------------------------------------------------------------------------------+
 ====================================================================================================
 ```
 
 ---
 
+## 7-Model Empirical Benchmark Results
+
+All models were evaluated across **49 sequential expanding walk-forward folds** ($N = 857$ finishes across 2023–2025) and a held-out 2025 championship test set ($N = 368$ finishes):
+
+| # | Model Architecture | Paradigm / Key Hyperparameters | MAE (pos) | RMSE | Podium ROC-AUC | Points ROC-AUC | Acc $\le \pm 1$ | Acc $\le \pm 2$ | Error Reduction vs Baseline |
+|:---:|:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 1 | **Starting Grid Baseline** | Status-quo qualifying heuristic ($\hat{y} = P_{\text{grid}}$) | 2.711 | 3.874 | 93.96% | 87.53% | 42.12% | 58.11% | Baseline (0.0%) |
+| 2 | **Historical Rolling Mean** | 3-event moving finishing average (`driver_race_mean_last3`) | 3.015 | 3.842 | 90.43% | 82.71% | 23.91% | 47.83% | -10.97% |
+| 3 | **Ridge Regression** | L2-regularized linear model ($\alpha = 1.0$) | 2.228 | 3.145 | 94.21% | 88.11% | 28.14% | 57.29% | +17.82% |
+| 4 | **Random Forest** | Bagged decision trees ($N = 150$, $\text{max\_depth} = 6$) | 2.288 | 3.190 | 94.70% | 88.32% | 31.04% | 56.48% | +15.60% |
+| 5 | **LightGBM** | Leaf-wise GBDT ($\text{leaves} = 31$, $\eta = 0.05$) | 2.377 | 3.156 | 94.57% | 87.72% | 30.43% | 54.62% | +12.51% |
+| 6 | **XGBoost** | Depth-wise GBDT ($\text{depth} = 3$, $\eta = 0.05$, $N = 120$) | 2.283 | 3.185 | 94.08% | 87.20% | 30.80% | 55.90% | +15.79% |
+| 7 | **APEX AI Hybrid** | **Gradient Boosting + Intra-Race Ordinal Ranking** | **2.191** | **3.109** | **94.43%** | **81.78%** | **49.33%** | **67.21%** | **+19.16%** |
+
+### Statistical & Domain Significance
+- **Statistical Significance**: Paired Student's $t = 6.2559$ ($p = 6.24 \times 10^{-10}$); Wilcoxon signed-rank $W = 75,599.0$ ($p = 1.924 \times 10^{-9}$).
+- **Classification Authority**: Specialized Podium Classifier achieves **90.43% accuracy** (**94.43% ROC-AUC**); Top-10 Points Classifier achieves **75.22% accuracy** (**81.78% ROC-AUC**).
+- **Physical Cluster Performance**:
+  - Cluster 1 (Low-Downforce Power): **1.942 MAE**
+  - Cluster 3 (Maximum Downforce / Mechanical Grip): **2.090 MAE**
+  - Cluster 2 (High Thermal Degradation): **2.130 MAE**
+  - Cluster 4 (Stop-and-Go Street Circuits): **2.402 MAE**
+
+---
+
 ## 23-Feature End-to-End Data Dictionary
 
-The predictive models in APEX AI operate on a curated 23-feature representation categorized across three physical and sporting dimensions:
+The predictive models operate on a curated 23-feature representation categorized across three physical and sporting dimensions:
 
 | # | Feature Identifier | Mathematical Symbol | Domain Category | Data Type | Physical / Statistical Definition |
 |:---:|:---|:---:|:---|:---:|:---|
@@ -87,41 +120,139 @@ The predictive models in APEX AI operate on a curated 23-feature representation 
 
 ---
 
-## Project Directory Hierarchy
+## Installation & Setup
+
+### Prerequisites
+- Python 3.10, 3.11, or 3.12+ (standard CPython distribution)
+- Operating System: Windows 10/11, Ubuntu 20.04/22.04 LTS, or macOS 13+
+
+### Clone & Install
+```bash
+# Clone the repository
+git clone https://github.com/bhxvxsh/yeah-def-my-nyc-project.git
+cd yeah-def-my-nyc-project
+
+# Instantiate isolated virtual environment
+python -m venv venv
+
+# Activate virtual environment:
+# On Windows (PowerShell):
+.\venv\Scripts\Activate.ps1
+# On Windows (cmd.exe):
+.\venv\Scripts\activate.bat
+# On Linux / macOS:
+source venv/bin/activate
+
+# Upgrade pip and install pinned dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+---
+
+## Quickstart & Interactive Usage
+
+### 1. Inquire Real-Time Race Strategy (CLI)
+Query the trained predictive core for driver finishing predictions, tactical pace delta, and strategy recommendations:
+```bash
+python 05_Analytics/apex_cli.py --driver "NOR" --circuit "Silverstone" --session "Race"
+```
+
+### 2. Natural Language Strategic Reasoning (Tool-Augmented ReAct Agent)
+Pose high-dimensional race strategy dilemmas to the autonomous analyst:
+```bash
+python 05_Analytics/ask_apex_cli.py "Evaluate whether Lando Norris should pit for Hard tires on Lap 32 during a Safety Car at Silverstone, given an ambient track temperature of 38C and an expected 18-second pit loss delta."
+```
+
+### 3. Run the Full Analytics & Verification Suite
+```bash
+python 05_Analytics/run_analytics_suite.py
+```
+
+---
+
+## Academic Outreach & Mentor Package
+
+For mentors, professors, and peer reviewers, all formal research collateral is centralized in [`08_Academic_Submission/`](08_Academic_Submission/):
+
+| Document | Purpose & Description | Link |
+|:---|:---|:---:|
+| **Research Abstract** | Standalone 225-word summary detailing the research question, physical clustering, QLoRA ReAct agent, and empirical findings. | [`ABSTRACT.md`](08_Academic_Submission/ABSTRACT.md) |
+| **Research Paper Draft** | Full IEEE Transactions-format manuscript (Introduction, System Architecture, Telemetry Features, ML Core, ReAct Sandbox, Walk-Forward Results, Limitations). | [`PAPER.md`](08_Academic_Submission/PAPER.md) |
+| **IEEE LaTeX Source** | Complete compilation package (`main.tex`, `references.bib` with 28 citations, `IEEEtran.cls`, `IEEEtran.bst`). | [`main.tex`](08_Academic_Submission/main.tex) |
+| **Results Summary Table** | Single-page comparative benchmark matrix contrasting 7 model paradigms across 8 statistical metrics. | [`RESULTS_SUMMARY.md`](08_Academic_Submission/RESULTS_SUMMARY.md) |
+| **Reproducibility Protocol** | Deterministic replication guide for environment bootstrapping, model training, and figure generation. | [`REPRODUCIBILITY.md`](08_Academic_Submission/REPRODUCIBILITY.md) |
+| **Mentor Outreach Letter** | Formal academic cover letter (Tier A) and high-impact email template (Tier B) for faculty acknowledgment. | [`MENTOR_COVER_LETTER.md`](08_Academic_Submission/MENTOR_COVER_LETTER.md) |
+| **Publication Figures** | Complete suite of 7 high-resolution figures in both vector PDF and 300+ DPI PNG formats. | [`figures/`](08_Academic_Submission/figures/) |
+
+---
+
+## Reproducibility & Testing
+
+### Generate All Publication Figures (300+ DPI Vector PDF & PNG)
+To re-render all 7 publication figures with zero typographic collisions:
+```bash
+python 06_Research_Paper/scripts/generate_all_figures.py
+```
+*Output*: Generates both vector `.pdf` and 300+ DPI raster `.png` assets in `06_Research_Paper/figures/` and `08_Academic_Submission/figures/`.
+
+### Run Automated Verification Test Suite (27/27 Tests)
+APEX AI maintains a rigorous test suite validating figure typography, empirical assertions, LaTeX syntax, and academic requirements:
+```bash
+# Execute master test runner (runs all 27 tests):
+python tests/run_e2e_tests.py --suite all
+
+# Or run individual test suites:
+python tests/run_e2e_tests.py --suite paper        # 19 IEEE research paper tests
+python tests/run_e2e_tests.py --suite submission   # 8 academic outreach tests
+
+# Standard pytest execution:
+pytest tests/ -v
+```
+
+---
+
+## Project Repository Structure
 
 ```
 APEX_AI/
-├── 00_Setup/                          # Environment bootstrapping & dependency scripts
-├── 01_Data_Raw/                       # FastF1 raw API caching layer & FIA session data
-├── 02_Data_Processed/                 # SQLite relational database (f1.db: 64 GPs, 1,119 finishers)
-├── 03_Training_Dataset/               # Telemetry engineering, circuit taxonomy, Alpaca QLoRA corpus
-│   ├── circuit_taxonomy.py            # Physical 4-cluster downforce regime mapping
+├── 00_Setup/                          # Environment bootstrapping & data pipelines
+│   ├── clean_data.py                  # Telemetry normalization and cleaning
+│   ├── download_fastf1.py             # FIA & FastF1 API ingestion pipeline
+│   └── requirements.txt               # Pinned environment requirements
+├── 01_Data_Raw/                       # FastF1 raw API caching layer (gitignored)
+├── 02_Data_Processed/                 # SQLite database (f1.db: 64 GPs, 1,119 finishers)
+├── 03_Training_Dataset/               # Telemetry engineering & circuit taxonomy
+│   ├── circuit_taxonomy.py            # Physical 4-cluster aerodynamic regime mapping
 │   ├── micro_sector_dynamics.py       # High-frequency kinematic feature extractors
+│   ├── f1_technical_alpaca.json       # Alpaca-format QLoRA fine-tuning dataset
 │   └── full_features.csv              # Curated 23-feature training matrix
 ├── 04_Models/                         # Supervised ML algorithms & walk-forward engine
 │   ├── train_baseline.py              # Baseline regression & classification model training
 │   ├── evaluate_models.py             # Performance metric computation & ROC-AUC curves
-│   ├── walk_forward_cv.py             # 49-fold expanding walk-forward temporal cross-validation
+│   ├── walk_forward_cv.py             # 49-fold sequential expanding walk-forward temporal CV
 │   ├── baseline_metrics_summary.json  # Held-out 2025 test metrics
 │   └── walk_forward_metrics.json      # Complete 49-fold out-of-sample metrics & statistics
 ├── 05_Analytics/                      # Autonomous agent reasoning & interactive tools
 │   ├── react_agent.py                 # 5-step ReAct reasoning agent implementation
 │   ├── tool_maker.py                  # Dynamic F1 Analyst Sandbox (LATM execution environment)
 │   ├── apex_cli.py                    # Interactive strategy query CLI
-│   └── ask_apex_cli.py                # Natural language telemetry query CLI
+│   ├── ask_apex_cli.py                # Natural language telemetry query CLI
+│   └── run_analytics_suite.py         # Master analytics pipeline runner
 ├── 06_Research_Paper/                 # IEEE Transactions publication manuscript & assets
 │   ├── main.tex                       # IEEEtran LaTeX source code
 │   ├── PAPER.md                       # Comprehensive markdown publication draft
 │   ├── references.bib                 # 28 peer-reviewed BibTeX citations
+│   ├── IEEEtran.cls / .bst            # Official IEEE Transactions styling files
 │   ├── figures/                       # High-resolution vector PDF & 300+ DPI PNG figures (fig1–fig7)
 │   └── scripts/                       # Reproducible Python figure generation scripts
 ├── 07_Notebooks/                      # Colab fine-tuning & experimental research notebooks
 │   └── apex_ai_master_colab.ipynb     # 4-bit QLoRA Llama-3-8B fine-tuning notebook
 ├── 08_Academic_Submission/            # Autonomous academic outreach & mentor package
-│   ├── ABSTRACT.md                    # Standalone 200–300 word research abstract
+│   ├── ABSTRACT.md                    # Standalone 225-word research abstract
 │   ├── PAPER.md                       # Formatted mentor-ready IEEE research manuscript
 │   ├── main.tex                       # IEEEtran LaTeX manuscript source
-│   ├── references.bib                 # Peer-reviewed BibTeX citations
+│   ├── references.bib                 # 28 peer-reviewed BibTeX citations
 │   ├── IEEEtran.cls / .bst            # Official IEEE Transactions styling files
 │   ├── RESULTS_SUMMARY.md             # Single-page 7-model comparative results table
 │   ├── REPRODUCIBILITY.md             # Standalone execution & reproduction guide
@@ -130,78 +261,13 @@ APEX_AI/
 ├── tests/                             # Comprehensive test automation suite
 │   ├── test_e2e_research_paper.py     # 19 end-to-end research paper tests across 4 tiers
 │   ├── test_academic_submission.py    # 8 companion academic outreach verification tests
-│   └── run_e2e_tests.py               # Unified test runner with multi-suite CLI flags
+│   └── run_e2e_tests.py               # Master test runner with multi-suite CLI flags
+├── .gitignore                         # Git exclusion rules
+├── LICENSE                            # MIT License
 ├── README.md                          # Repository documentation & publication overview
 ├── RESULTS_SUMMARY.md                 # Standalone single-page comparative benchmark table
-└── REPRODUCIBILITY.md                 # Root reproducibility & execution protocol
-```
-
----
-
-## 7-Model Empirical Benchmark
-
-Evaluated over **49 sequential expanding walk-forward folds** ($N = 857$ finishes across 2023–2025) and a held-out 2025 championship test set ($N = 368$ finishes):
-
-| # | Model Architecture | Paradigm / Key Hyperparameters | MAE (pos) | RMSE | Podium ROC-AUC | Points ROC-AUC | Acc $\le \pm 1$ | Acc $\le \pm 2$ | Error Reduction vs Baseline |
-|:---:|:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| 1 | **Starting Grid Baseline** | Status-quo qualifying heuristic ($\hat{y} = P_{\text{grid}}$) | 2.711 | 3.874 | 93.96% | 87.53% | 42.12% | 58.11% | Baseline (0.0%) |
-| 2 | **Historical Rolling Mean** | 3-event moving finishing average (`driver_race_mean_last3`) | 3.015 | 3.842 | 90.43% | 82.71% | 23.91% | 47.83% | -10.97% |
-| 3 | **Ridge Regression** | L2-regularized linear model ($\alpha = 1.0$) | 2.228 | 3.145 | 94.21% | 88.11% | 28.14% | 57.29% | +17.82% |
-| 4 | **Random Forest** | Bagged decision trees ($N = 150$, $\text{max\_depth} = 6$) | 2.288 | 3.190 | 94.70% | 88.32% | 31.04% | 56.48% | +15.60% |
-| 5 | **LightGBM** | Leaf-wise GBDT ($\text{leaves} = 31$, $\eta = 0.05$) | 2.377 | 3.156 | 94.57% | 87.72% | 30.43% | 54.62% | +12.51% |
-| 6 | **XGBoost** | Depth-wise GBDT ($\text{depth} = 3$, $\eta = 0.05$, $N = 120$) | 2.283 | 3.185 | 94.08% | 87.20% | 30.80% | 55.90% | +15.79% |
-| 7 | **APEX AI Hybrid** | **Gradient Boosting + Intra-Race Ordinal Ranking** | **2.191** | **3.109** | **94.43%** | **81.78%** | **49.33%** | **67.21%** | **+19.16%** |
-
-- **Statistical Significance**: Paired Student's $t = 6.2559$, **$p = 6.24 \times 10^{-10}$**; Wilcoxon signed-rank $W = 75,599.0$, **$p = 1.924 \times 10^{-9}$**.
-- **Tactical Classification**: Specialized Podium Classifier reaches **90.43% accuracy** (**94.43% ROC-AUC**); Points Classifier reaches **75.22% accuracy** (**81.78% ROC-AUC**).
-- **Circuit Clusters**: Cluster 1 (Low-Downforce Power): **1.942 MAE** | Cluster 3 (Max Grip): **2.090 MAE** | Cluster 2 (Thermal Deg): **2.130 MAE** | Cluster 4 (Street): **2.402 MAE**.
-
----
-
-## One-Command Reproducibility Guide
-
-### 1. Environment Setup
-```bash
-git clone https://github.com/APEX-AI-Research/APEX_AI.git
-cd APEX_AI
-python -m venv venv
-# Windows:
-.\venv\Scripts\activate
-# Linux/macOS:
-source venv/bin/activate
-pip install -r 00_Setup/requirements.txt
-```
-
-### 2. Generate All Publication Figures (300+ DPI Vector PDF & PNG)
-```bash
-python 06_Research_Paper/scripts/generate_all_figures.py
-```
-*Expected output*: Audits and renders Figures 1 through 7 in both vector `.pdf` and raster 300+ DPI `.png` format with zero overlapping typography.
-
-### 3. Execute End-to-End Test Suites
-```bash
-# Run existing 19-test IEEE research paper verification suite:
-pytest tests/test_e2e_research_paper.py -v
-
-# Run companion 8-test academic submission outreach suite:
-pytest tests/test_academic_submission.py -v
-
-# Or execute all 27 tests via the master runner:
-python tests/run_e2e_tests.py --suite all
-```
-
----
-
-## Interactive CLI & ReAct Agent Usage
-
-### Inquire Race Strategy Recommendations
-```bash
-python 05_Analytics/apex_cli.py --driver "NOR" --circuit "Silverstone" --session "Race"
-```
-
-### Natural Language Strategy Synthesis (Tool-Augmented Reasoning)
-```bash
-python 05_Analytics/ask_apex_cli.py "Evaluate whether Car 4 should pit for Soft or Medium tires during a drying track at Silverstone on Lap 27."
+├── REPRODUCIBILITY.md                 # Root reproducibility & execution protocol
+└── requirements.txt                   # Root pinned Python dependencies
 ```
 
 ---
@@ -217,6 +283,12 @@ If you utilize APEX AI's telemetry features, aerodynamic taxonomy, walk-forward 
   journal   = {IEEE Transactions on Neural Networks and Learning Systems (Preprint)},
   year      = {2026},
   pages     = {1--16},
-  url       = {https://github.com/APEX-AI-Research/APEX_AI}
+  url       = {https://github.com/bhxvxsh/yeah-def-my-nyc-project}
 }
 ```
+
+---
+
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.

@@ -22,7 +22,7 @@ Clone the repository and instantiate an isolated virtual environment:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/APEX-AI-Research/APEX_AI.git
+git clone https://github.com/bhxvxsh/yeah-def-my-nyc-project.git
 cd APEX_AI
 
 # 2. Create virtual environment
