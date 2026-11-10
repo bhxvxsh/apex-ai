@@ -93,7 +93,7 @@ Recent advances in Large Language Models (LLMs) have demonstrated strong capabil
 
 To deploy complex LLM agents within local edge environments without incurring multi-gigabyte memory footprints, parameter-efficient fine-tuning (PEFT) has emerged as an essential methodology. Hu et al.~\cite{hu2022lora} introduced Low-Rank Adaptation (LoRA), decomposing weight update matrices into low-rank representations. Dettmers et al.~\cite{dettmers2022llmint8, dettmers2023qlora} developed QLoRA, integrating 4-bit NormalFloat (NF4) quantization and double quantization, enabling instruction-tuning of state-of-the-art foundation models such as Llama-2~\cite{touvron2023llama2} and Llama-3~\cite{dubey2024llama3} on consumer-grade hardware. APEX AI leverages these advances by pairing a 4-bit QLoRA fine-tuned Llama-3-8B model with a 5-step ReAct loop and an isolated Python/SQL execution sandbox.
 
-\section{System Architecture \& Methodology}
+\section{System Architecture, Vehicle Dynamics \& Telemetry Methodology}
 \label{sec:architecture}
 The architecture of APEX AI is structured into four functional tiers, illustrated in Fig.~\ref{fig:system_architecture}: (1) Multi-Modal Telemetry and Timing Ingestion; (2) Micro-Sector Dynamics and Circuit Taxonomy Engine; (3) Supervised Machine Learning Pipeline with Walk-Forward Cross-Validation; and (4) Autonomous ReAct Reasoning Engine with Sandboxed Execution.
 
@@ -159,8 +159,11 @@ Race strategists require explainable reasoning alongside raw point predictions. 
 
 When user queries require ad-hoc statistical correlations not covered by pre-compiled tools, the agent activates the \textit{Dynamic F1 Analyst Sandbox} (LATM paradigm~\cite{cai2023latm}). The model synthesizes Python/SQL code, executes it within an isolated environment binding NumPy, Pandas, SciPy, and SQLite, and integrates the captured standard output directly into its reasoning trace.
 
-\section{Mathematical Formulation \& Empirical Hypotheses}
+\section{Problem Formulation, Mathematical Modeling \& Empirical Hypotheses}
 \label{sec:formulation}
+
+\subsection{Problem Formulation}
+Given a competitive grid of drivers $\mathcal{D}^{(k)} = \{1, 2, \dots, N\}$ contesting Grand Prix round $k \in \{1, \dots, K\}$ at circuit $\mathcal{C}^{(k)}$, the race finish prediction objective is formulated as determining an optimal mapping $f: \mathcal{X}^{(k)} \to \mathcal{P}^{(k)}$ from the $d$-dimensional multi-modal telemetry and kinematic feature space $\mathcal{X}^{(k)} \in \mathbb{R}^{N \times d}$ to the discrete ordinal permutation simplex $\mathcal{P}^{(k)} = \text{Perm}(\{1, 2, \dots, N\})$. Unlike unconstrained continuous regression frameworks where overlapping predictions $\hat{y}_i \approx \hat{y}_j$ violate physical uniqueness, Formula 1 outcomes operate under a hard combinatorial zero-sum conservation constraint: $\sum_{i=1}^N \hat{P}_i^{(k)} = \frac{N(N + 1)}{2}$, with strict mutual exclusion $\hat{P}_i^{(k)} \ne \hat{P}_j^{(k)}$ for all $i \ne j$.
 
 \subsection{Micro-Sector Dynamics \& Kinematic Equations}
 Let $t_{i,s}^{(k)}$ denote the lap time recorded by driver $i \in \mathcal{D}^{(k)}$ during qualifying session $s \in \{\text{Q1}, \text{Q2}, \text{Q3}\}$ at event $k$. The driver's optimal qualifying lap time is defined as:
@@ -302,7 +305,7 @@ We test whether the tool-augmented ReAct strategic agent produces well-calibrate
 \label{fig:walk_forward_scheme}
 \end{figure*}
 
-\section{Experimental Setup \& Walk-Forward Validation}
+\section{Experimental Setup \& Walk-Forward Validation (49 GP Folds)}
 \label{sec:experimental}
 
 \subsection{Dataset Provenance \& Temporal Split Boundaries}
@@ -364,7 +367,7 @@ To implement the autonomous strategy reasoning agent, we instruction-tune the Me
 \label{fig:model_performance}
 \end{figure*}
 
-\section{Results \& Quantitative Analysis}
+\section{Empirical Results \& Quantitative Analysis}
 \label{sec:results}
 
 \subsection{Walk-Forward Cross-Validation Performance}
@@ -499,12 +502,20 @@ To evaluate the qualitative reasoning fidelity of the ReAct agent, we simulated 
 \end{quote}
 This qualitative trace demonstrates the agent's ability to interleave domain aerodynamics, physical tire equations, and sandboxed SQL queries to synthesize actionable tactical recommendations, directly reflecting the actual historical race outcome.
 
-\subsection{Limitations}
-While APEX AI achieves strong predictive performance, several limitations remain:
-\begin{itemize}
-    \item \textbf{Safety Car and Weather Stochasticity:} Sudden multi-car pileups, red flags, and rapid localized rainfall exhibit stochastic characteristics that cannot be predicted from pre-session telemetry alone.
-    \item \textbf{In-Season Aerodynamic Upgrade Discontinuities:} When a team introduces a major aerodynamic floor or sidepod upgrade package mid-season, historical rolling pace metrics underestimate car pace until 2--3 events of calibration data accumulate.
-\end{itemize}
+\subsection{Limitations and Operational Edge Cases}
+While APEX AI achieves strong empirical predictive accuracy and robust tactical calibration across 49 walk-forward folds, several operational and aerodynamic boundaries remain:
+
+\subsubsection{Wet Weather Stochasticity}
+Formula 1 tire performance exhibits severe non-linear discontinuities during wet weather transitions. In dry running, slicks operate on viscoelastic adhesive friction within an optimal thermal window ($105^\circ\text{C}$--$125^\circ\text{C}$). However, when localized precipitation occurs, transition regimes between slick and intermediate/wet compounds induce abrupt non-linear grip collapse on greasy surfaces with standing water films under 1.0\,mm. Extreme rainfall delays and track red flags introduce stochastic disruptions that cannot be predicted from pre-session dry telemetry alone.
+
+\subsubsection{Safety Car \& Virtual Safety Car Interventions}
+Tactical delta-neutralization phases---including full Safety Car (SC) deployments and Virtual Safety Car (VSC) periods---introduce discrete topological distortions into continuous race dynamics. Mandatory speed restrictions compress pit-stop transit deltas from $\sim$22\,s down to $\sim$11\,s, creating opportunistic ``free'' pit windows that invalidate nominal pit-window modeling. Furthermore, artificial field compression behind the physical Safety Car eliminates earned track gaps and disrupts steady-state tire thermal degradation wear cycles.
+
+\subsubsection{Aerodynamic Ground-Effect Wake Sensitivity}
+Under 2022+ technical regulation nuances, contemporary ground-effect cars rely predominantly on underfloor Venturi suction tunnels. In sustained following running within 1.5\,s, dirty-air wake turbulence induces severe front-axle wash-out and front-wing downforce shedding (loss of 25\%--35\% front load). This aero loss forces drivers into elevated slip angles that cause accelerated thermal blistering and carcass overheating, inflating midfield finish variance.
+
+\subsubsection{In-Season Aerodynamic Upgrade Discontinuities}
+When teams introduce major aerodynamic floor, diffuser, or sidepod redesign packages mid-season, historical rolling pace metrics underestimate car pace until 2--3 Grand Prix events of calibration data accumulate.
 
 \section{Conclusion \& Future Work}
 \label{sec:conclusion}

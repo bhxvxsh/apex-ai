@@ -63,7 +63,7 @@ To deploy complex LLM agents within local edge environments without incurring mu
 
 ---
 
-## Section III: System Architecture & Methodology
+## Section III: System Architecture, Vehicle Dynamics & Telemetry Methodology
 
 The architecture of APEX AI is structured into four functional tiers: (1) Multi-Modal Telemetry and Timing Ingestion; (2) Micro-Sector Dynamics and Circuit Taxonomy Engine; (3) Supervised Machine Learning Pipeline with Walk-Forward Cross-Validation; and (4) Autonomous ReAct Reasoning Engine with Sandboxed Execution.
 
@@ -114,7 +114,10 @@ When user queries require ad-hoc statistical correlations not covered by pre-com
 
 ---
 
-## Section IV: Mathematical Formulation & Empirical Hypotheses
+## Section IV: Problem Formulation, Mathematical Modeling & Empirical Hypotheses
+
+### Problem Formulation
+Given a competitive grid of drivers $\mathcal{D}^{(k)} = \{1, 2, \dots, N\}$ contesting Grand Prix round $k \in \{1, \dots, K\}$ at circuit $\mathcal{C}^{(k)}$, the race finish prediction objective is formulated as determining an optimal mapping $f: \mathcal{X}^{(k)} \to \mathcal{P}^{(k)}$ from the $d$-dimensional multi-modal telemetry and kinematic feature space $\mathcal{X}^{(k)} \in \mathbb{R}^{N \times d}$ to the discrete ordinal permutation simplex $\mathcal{P}^{(k)} = \text{Perm}(\{1, 2, \dots, N\})$. Unlike unconstrained continuous regression frameworks where overlapping predictions $\hat{y}_i \approx \hat{y}_j$ violate physical uniqueness, Formula 1 outcomes operate under a hard combinatorial zero-sum conservation constraint: $\sum_{i=1}^N \hat{P}_i^{(k)} = \frac{N(N + 1)}{2}$, with strict mutual exclusion $\hat{P}_i^{(k)} \ne \hat{P}_j^{(k)}$ for all $i \ne j$.
 
 ### Micro-Sector Dynamics & Kinematic Equations
 Let $t_{i,s}^{(k)}$ denote the lap time recorded by driver $i \in \mathcal{D}^{(k)}$ during qualifying session $s \in \{\text{Q1}, \text{Q2}, \text{Q3}\}$ at event $k$. The driver's optimal qualifying lap time is defined as:
@@ -212,7 +215,7 @@ We test whether the tool-augmented ReAct strategic agent produces well-calibrate
 
 ---
 
-## Section V: Experimental Setup & Walk-Forward Validation
+## Section V: Experimental Setup & Walk-Forward Validation (49 GP Folds)
 
 ### Dataset Provenance & Temporal Split Boundaries
 The empirical corpus is derived from official FIA timing feeds across the 2023, 2024, and 2025 Formula 1 seasons, comprising 64 Grand Prix events, 1,278 total race starts, and 1,119 verified classified finishes (Table 1).
@@ -256,7 +259,7 @@ To implement the autonomous strategy reasoning agent, we instruction-tune the Me
 
 ---
 
-## Section VI: Results & Quantitative Analysis
+## Section VI: Empirical Results & Quantitative Analysis
 
 ### Walk-Forward Cross-Validation Performance
 Table 2 reports empirical out-of-sample performance across all 49 sequential Grand Prix folds ($N = 857$ finishes). APEX AI achieves an overall Mean Absolute Error of **2.191 positions** and an RMSE of **3.109**, outperforming the status-quo grid baseline (MAE **2.711**, RMSE **3.874**) by **19.16%**. Random Forest (MAE 2.288) and Ridge Regression (MAE 2.228) also improve upon the baseline, but fail to match the precision of ranked gradient boosting.
@@ -353,10 +356,20 @@ To evaluate the qualitative reasoning fidelity of the ReAct agent, we simulated 
 
 This qualitative trace demonstrates the agent's ability to interleave domain aerodynamics, physical tire equations, and sandboxed SQL queries to synthesize actionable tactical recommendations, directly reflecting the actual historical race outcome.
 
-### Limitations
-While APEX AI achieves strong predictive performance, several limitations remain:
-- **Safety Car and Weather Stochasticity:** Sudden multi-car pileups, red flags, and rapid localized rainfall exhibit stochastic characteristics that cannot be predicted from pre-session telemetry alone.
-- **In-Season Aerodynamic Upgrade Discontinuities:** When a team introduces a major aerodynamic floor or sidepod upgrade package mid-season, historical rolling pace metrics underestimate car pace until 2–3 events of calibration data accumulate.
+### Limitations and Operational Edge Cases
+While APEX AI achieves strong empirical predictive accuracy and robust tactical calibration across 49 walk-forward folds, several operational and aerodynamic boundaries remain:
+
+#### Wet Weather Stochasticity
+Formula 1 tire performance exhibits severe non-linear discontinuities during wet weather transitions. In dry running, slicks operate on viscoelastic adhesive friction within an optimal thermal window ($105^\circ\text{C}$–$125^\circ\text{C}$). However, when localized precipitation occurs, transition regimes between slick and wet/intermediate compounds induce abrupt non-linear grip collapse on greasy surfaces with standing water films under 1.0 mm. Extreme rainfall delays and track red flags introduce stochastic disruptions that cannot be predicted from pre-session dry telemetry alone.
+
+#### Safety Car & Virtual Safety Car Interventions
+Tactical delta-neutralization phases—including full Safety Car (SC) deployments and Virtual Safety Car (VSC) periods—introduce discrete topological distortions into continuous race dynamics. Mandatory speed restrictions compress pit-stop transit deltas from ~22s down to ~11s, creating opportunistic "free" pit windows that invalidate nominal pit-window modeling. Furthermore, artificial field compression behind the physical Safety Car eliminates earned track gaps and disrupts steady-state tire thermal degradation wear cycles.
+
+#### Aerodynamic Ground-Effect Wake Sensitivity
+Under 2022+ technical regulation nuances, contemporary ground-effect cars rely predominantly on underfloor Venturi suction tunnels. In sustained following running within 1.5s, dirty-air wake turbulence induces severe front-axle wash-out and front-wing downforce shedding (loss of 25%–35% front load). This aero loss forces drivers into elevated slip angles that cause accelerated thermal blistering and carcass overheating, inflating midfield finish variance.
+
+#### In-Season Aerodynamic Upgrade Discontinuities
+When teams introduce major aerodynamic floor, diffuser, or sidepod redesign packages mid-season, historical rolling pace metrics underestimate car pace until 2–3 Grand Prix events of calibration data accumulate.
 
 ---
 
