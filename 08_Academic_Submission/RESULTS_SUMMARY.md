@@ -8,7 +8,7 @@
 
 ### Table 1: Comprehensive 7-Model Performance Benchmark
 
-| # | Model Architecture | Paradigm / Key Hyperparameters | MAE (pos) | RMSE | Podium ROC-AUC | Points ROC-AUC | Acc (±1 pos) | Acc (±2 pos) | Rel. Gain vs Baseline |
+| # | Model Architecture | Paradigm / Key Hyperparameters | MAE (pos) | RMSE | Podium ROC-AUC | Points ROC-AUC | Acc ±1 | Acc ±2 | Rel. Gain vs Baseline |
 |:---:|:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | 1 | **Starting Grid Baseline** | Status-quo qualifying heuristic ($\hat{y} = P_{\text{grid}}$) | 2.711 | 3.874 | 93.96% | 87.53% | 42.12% | 58.11% | Baseline (0.0%) |
 | 2 | **Historical Rolling Mean** | 3-event moving finishing average (`driver_race_mean_last3`) | 3.015 | 3.842 | 90.43% | 82.71% | 23.91% | 47.83% | -10.97% |
